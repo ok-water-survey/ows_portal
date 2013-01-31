@@ -291,7 +291,7 @@ function onFeatureSelectNav(evt) {
                 "<tr><th>ID</th><td>"+feature.attributes.REF_NO + "</td></tr>" +
                 "<tr><th>Type</th><td>"+feature.attributes.Taxon + "</td></tr>" +
                 "<tr><th>Status</th><td>"+feature.attributes.Year + "</td></tr>" +
-                "<tr><td colspan='2'><a style='color:blue;' href='http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no="+feature.attributes.REF_NO +"' target='_blank'>Data Access</a></td></tr>" +
+                "<tr><td colspan='2'><a style='color:blue;' href='#' onclick='showbib("+'"'+feature.attributes.REF_NO+'"'+")'>Data Access</a></td></tr>" +
                 "<tr><td colspan='2'><a style='color:blue;' href='http://maps.google.com/maps?z=15&t=k&q=loc:"+feature.attributes.lat+","+feature.attributes.lon+"' target='_blank'>Google Maps</a></td></tr></table>" ,
                 null, true, onPopupClose);
         popup.panMapIfOutOfView = true;
@@ -344,7 +344,8 @@ function showbib(ref_no) {
 	if ($("#bibAll"+ref_no).length < 1) {
 		$("body").append('<div id="bibAll'+ref_no+'"></div>');
 		$("#bibAll"+ref_no).dialog({ height:'auto', width:'900px', position: [300,100], title: "<h3>Data</h3>", close: function() { $("#bibAll"+ref_no).remove(); } });
-		$("#bibAll"+ref_no).append('<iframe id="iframe'+ref_no+'" src="http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no='+ref_no+'" width="100%" height="700"></iframe>');
+		//$("#bibAll"+ref_no).append('<iframe id="iframe'+ref_no+'" src="http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no='+ref_no+'" width="100%" height="700"></iframe>');
+                $("#bibAll"+ref_no).append('<iframe id="iframe'+ref_no+'" src="/tools/usgs_metadata/'+ref_no+'" width="100%" height="700"></iframe>');
 	}
 }
 function setcursor(){
