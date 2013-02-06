@@ -9,7 +9,7 @@
 //Version 
 var verDate={"0":"0.01","1":"18 December 2012"};
 //Declarations
-var map, options, siteLayer, selectControls, floraStyles;
+var map, options, siteLayer, selectControls, siteStyles,drawLayer;
 var lay_osm,glayers
 var sitesTotal=[], sitesActive=[], sitesSel=[];
 var baseurl = "http://test.cybercommons.org";
@@ -18,8 +18,26 @@ var plot_data=[], selplot_data=[], plotDesc=[], plotselDesc=[];
 var savflg=0;
 var qry='';
 var enqry='';
-//var states = {"AL":"Alabama","AK":"Alaska","AZ":"Arizona","AR":"Arkansas","CA":"California","CO":"Colorado","CT":"Connecticut","DE":"Delaware","DC":"District/Columbia","FL":"Florida","GA":"Georgia","HI":"Hawaii","ID":"Idaho","IL":"Illinois","IN":"Indiana","IA":"Iowa","KS":"Kansas","KY":"Kentucky","LA":"Louisiana","ME":"Maine","MD":"Maryland","MA":"Massachusetts","MI":"Michigan","MN":"Minnesota","MS":"Mississippi","MO":"Missouri","MT":"Montana","NE":"Nebraska","NV":"Nevada","NH":"New Hampshire","NJ":"New Jersey","NM":"New Mexico","NY":"New York","NC":"North Carolina","ND":"North Dakota","OH":"Ohio","OK":"Oklahoma","OR":"Oregon","PA":"Pennsylvania","RI":"Rhode Island","SC":"South Carolina","SD":"South Dakota","TN":"Tennessee","TX":"Texas","UT":"Utah","VT":"Vermont","VA":"Virginia","WA":"Washington","WV":"West Virginia","WI":"Wisconsin","WY":"Wyoming","ALB":"Alberta","BCL":"British Columbia","CAN":"Canada","MAN":"Manitoba","NB":"New Brunswick","NFL":"Newfoundland","NS":"Nova Scotia","NWT":"Northwest Territories","ONT":"Ontario","PEI":"Prince Edward Island","QUE":"Quebec","SAS":"Saskatchewan","SPM":"Saint Pierre et Miquelon","YUK":"Yukon"};
+var fff;
 var stylesColor={"0":"#0000ff","1":"#b575b5","2":"#f5914d","3":"#bd2126","4":"#8cba52","5":"#8cc4d6","6":"#007a63","7":"#705421","8":"#69c4ad","9":"#008000","10":"#000080","11":"#800080","12":"#c0c0c0"};
+    // use a CQL parser for easy filter creation
+    var format = new OpenLayers.Format.CQL();
+
+    // this rule will get a filter from the CQL text in the form
+    var rule = new OpenLayers.Rule({
+        // We could also set a filter here.  E.g. #ff0000 #ffcccc
+        // filter: format.read("Taxon >= 'S' AND Taxon <= 'U'"),
+        symbolizer: {
+            fillColor: "#8CBA52",
+            strokeColor: "#000000",
+            fillOpacity: "0.9",
+            strokeWidth: "1",
+            graphicZIndex: "1",
+            pointRadius: "4.0"
+        }
+    });
+
+
 
 //on window load
 $(window).load(function() {
@@ -36,12 +54,7 @@ $(window).load(function() {
                 maxExtent : new OpenLayers.Bounds([ -19803292.13,-3405054.49, 547896.95, 15497748.74 ])
 	}
 	map = new OpenLayers.Map('map', options);
-        //var lay_goo = new OpenLayers.Layer.Google('Google', {
-        //        type: google.maps.MapTypeId.SATELLITE,
-        //        sphericalMercator: true
-        //    });
 	//ccbasemap = new OpenLayers.Layer.XYZ("ccbasemap", "http://129.15.41.144:8080/ccbasemap/${z}/${x}/${y}.png", { 'sphericalMercator' : true });
-        //lay_osm = new OpenLayers.Layer.Google('OSM');
         glayers= [
             new OpenLayers.Layer.Google(
                 "Google Physical",
@@ -73,11 +86,15 @@ $(window).load(function() {
 		map.setCenter(center, 7);	//re-center if globe clicked
     };
 
-	floraStyles = new OpenLayers.StyleMap({
+	siteStyles = new OpenLayers.StyleMap({
         "default": new OpenLayers.Style({ fillOpacity: 1, pointRadius: 3.5, strokeWidth: 1, fillColor: "#8CBA52", graphicZIndex: 1 }),
         "select": new OpenLayers.Style({ fillOpacity: 1, fillColor: "#F6358A", graphicZIndex: 2 })
     });
-    siteLayer = new OpenLayers.Layer.Vector("USGS Active Sites", {styleMap: floraStyles});
+        myStyles = new OpenLayers.StyleMap({
+        "default": new OpenLayers.Style({ fillOpacity: 1, fillColor: "#F6358A", graphicZIndex: 2 })
+    });
+    myStyles1 = new OpenLayers.StyleMap({"default": new OpenLayers.Style(null, {rules: [rule]})});
+    siteLayer = new OpenLayers.Layer.Vector("USGS Active Sites", {styleMap: myStyles1});
 
 	$("#totmsg").show() .html("Loading . . .");
 	var st=[];
@@ -88,7 +105,13 @@ $(window).load(function() {
 			var point = new OpenLayers.Geometry.Point(val.dec_long_va, val.dec_lat_va);
 			point = point.transform(options.displayProjection,options.projection);
 			var pointFeature = new OpenLayers.Feature.Vector(point, null, null);
-			pointFeature.attributes = {"REF_NO": val.site_no, "Sitename": val.station_nm, "State": "OK", "Year": val.status, "Area": val.agency_cd, "Taxon": val.site_tp_cd,'lat':val.dec_lat_va,'lon':val.dec_long_va};
+                        var modtype = val.site_tp_cd.replace(/-/g, ''); 
+                        var aqui='';
+                        if(val.aquifer){
+                         aqui = val.aquifer.replace(/-/g, '');
+                         aqui=aqui.replace(/\s+/g, '');
+                        }
+			pointFeature.attributes = {"REF_NO": val.site_no, "Sitename": val.station_nm, "State": "OK", "Year": val.status, "Area": val.agency_cd, "Taxon":modtype,'lat':val.dec_lat_va,'lon':val.dec_long_va,'aquifer':aqui};//al.aquifer};
 			siteLayer.addFeatures(pointFeature);
 			sitesActive.push(val.site_no);
 			
@@ -100,10 +123,6 @@ $(window).load(function() {
 			
 		}); //end each
 				
-		//$.each(st.sort(), function(key, val) {
-		//	$('#idstate').append('<option value='+val+'>'+states[val]+'</option>');
-		//	$('#State').append('<option value='+val+'>'+states[val]+'</option>');
-		//});
 		
 		$("#totmsg").html("<table width='100%'><tr><td>Total Sites: <b>"+sitesTotal.length+"</b></td><td style='text-align:right;'><a href='#' class='btn btn-info btn-mini' onclick='window.location.reload();'>Clear Selected</a></td></tr></table>");
 
@@ -114,7 +133,15 @@ $(window).load(function() {
                     $('#idstate').append('<option value='+val1.ows_url[0]+'>'+key + '-' + key1 +'</option>');
                 });
 
+            });
         });
+        $.getJSON(baseurl +"/mongo/distinct/ows/aquifers/properties.NAME/{}/", function(fdata){
+            fdata.sort();
+            $.each(fdata, function(key,val) {
+                $('#idaquifer').append('<option value='+ val + '>'+ val +'</option>');
+            });
+
+
         });
 	map.addLayer( siteLayer );
 
@@ -122,14 +149,16 @@ $(window).load(function() {
 	map.addControl( new OpenLayers.Control.LayerSwitcher() );
 	map.addControl( new OpenLayers.Control.ScaleLine() );
 	map.addControl( new OpenLayers.Control.OverviewMap());
-	
+//"default": new OpenLayers.Style({ display: 'none' })	
 	selStyle = new OpenLayers.StyleMap({
-		"default": new OpenLayers.Style({ display: 'none' })
-    });	
-    var drawLayer = new OpenLayers.Layer.Vector("Draw Layer", {styleMap: selStyle});
+                "default": new OpenLayers.Style({ display: 'none' })
+        });	
+        //selStyle1 =new OpenLayers.Style({ fillOpacity: 1, fillColor: "#F6358A", graphicZIndex: 2 })
+    drawLayer = new OpenLayers.Layer.Vector("Draw Layer", {styleMap: myStyles});//    new OpenLayers.Style({ fillOpacity: 1, fillColor: "#F6358A", graphicZIndex: 2 })});
+    
     //var circleLayer =  new OpenLayers.Layer.Vector("Circle layer", {styleMap: selStyle});
     //var boxLayer =     new OpenLayers.Layer.Vector("Box layer", {styleMap: selStyle});
-    //map.addLayer(drawLayer);//[polygonLayer,circleLayer,boxLayer]);
+    map.addLayer(drawLayer);//[polygonLayer,circleLayer,boxLayer]);
     //polygonLayer
     selectControls = { polygon: new OpenLayers.Control.DrawFeature(drawLayer, OpenLayers.Handler.Polygon),
     				 circle:  new OpenLayers.Control.DrawFeature(drawLayer,  OpenLayers.Handler.RegularPolygon, { handlerOptions: { sides: 40 } }),
@@ -142,8 +171,6 @@ $(window).load(function() {
         }); 
     for(var key in selectControls) {
         map.addControl(selectControls[key]);
-	//$("#downinfo"+i).append('<a style="color:#08C;" href=http://test.cybercommons.org/tools/getbib/endnote/{"spec":{"label":{"$in":['+saveselsites[i]+']}}}/flora/citation>EndNote</a> &bull; ');
-	//$("#downinfo"+i).append('<a style="color:#08C;" href=http://test.cybercommons.org/tools/getbib/endnote/{"spec":{"label":{"$in":['+saveselsites[i]+']}}}/flora/citation>EndNote</a> &bull; ');
         selectControls[key].events.register("featureadded", this, function (f) {
                 //OpenLayers.Element.addClass(map.viewPortDiv, "olCursorWait");
                 //map.div.style.cursor='wait';
@@ -217,7 +244,58 @@ $(document).ready( function() {
     	//}
         addlayer();
 	});
+        $("#search_aquifer").click(function() {
+            siteLayer.styleMap = myStyles1
+            var temp = $('#idaquifer option:selected').text().replace(/-/g, '');
+            temp = temp.replace(/\s+/g, '');
+            updateFilter("aquifer ='" +temp +"'");
+            siteLayer.redraw();
+            //drawAquiferFeature();
+        });
+        $("#show_aquifer").change(function() {
+            display_aquifer();
+        });
+        $('#idaquifer').change(function(){
+            display_aquifer();
+        });
+        $("#search_filter").click(function(){
+            siteLayer.styleMap = myStyles1
+            var filt = ''
+            if($('#idfilter').val()!=='ALL'){
+                if($('#idfilter').val()!== undefined){
+                    if($('#idfilter').val()!== null){
+                        filt = "Taxon = '" + $('#idfilter').val() +"'"
+                    }
+                }               
+            }
+            if($('#idaquifer').val()!=='ALL'){
+                if( $('#idaquifer').val()!==undefined ){
+                    if ( $('#idaquifer').val()!==null ){
+                        var temp = $('#idaquifer option:selected').text().replace(/-/g, '');
+                        temp = temp.replace(/\s+/g, '');
+                        if(filt===''){
+                            filt = "aquifer ='" +temp +"'";
+                        }else{
 
+                            filt=filt + ' AND ' + "aquifer ='" +temp +"'";
+                        }
+                    }
+                }
+            }
+            alert(filt)
+            if (filt===''){
+                siteLayer.styleMap = siteStyles;
+                siteLayer.redraw();
+            }else{
+                updateFilter(filt);
+                siteLayer.redraw();
+            }
+        });
+        $("#clear_filter").click(function(){
+            siteLayer.styleMap = siteStyles;
+            //rule.filter = None;
+            siteLayer.redraw();
+        });
 	$("#searchText").click(function() {
 		if ( $("#txtsrch").val() ) {
 			searchText($("#txtsrch").val());
@@ -240,6 +318,56 @@ $(document).ready( function() {
 	});
 
 }); //end document ready
+function display_aquifer(){
+   if($('#show_aquifer').attr('checked')?true:false){
+        drawLayer.removeAllFeatures();
+        drawAquiferFeature();
+   }else{
+        drawLayer.removeAllFeatures();
+   }
+}
+function updateFilter(fltr) {
+    var filter;
+    try {
+        filter = format.read(fltr);
+    } catch (err) {
+        alert(err.message);
+    }
+    if (filter) {
+        //output.value = "";
+        rule.filter = filter;
+        siteLayer.redraw();
+    }
+    return false;
+}
+function drawAquiferFeature(){
+    var in_options = {'internalProjection': map.projection,'externalProjection': map.projection};
+    var geojson_format = new OpenLayers.Format.GeoJSON(in_options);
+    drawLayer.removeAllFeatures();
+    $("#idaquifer option:selected").each(function (){
+    var url = baseurl + "/mongo/db_find/ows/aquifers/{'spec':{'properties.NAME':'" + $(this).text() + "'}}"
+    $.getJSON(url, function(fdata) {
+            var pre='{"type": "FeatureCollection","features":'
+            var geosjon_str = pre + JSON.stringify(fdata) + '}'
+            var features = geojson_format.read(geosjon_str, "FeatureCollection");
+            if(features.constructor != Array) {
+                features = [features];
+            }
+            drawLayer.addFeatures(features);
+            /*aquifer = $('#idaquifer option:selected').text();
+            var info =[];
+            $.each(drawLayer.features, function(key,f) {
+                $.each(siteLayer.features, function(key,val) {
+                        if(val.geometry.intersects(f.geometry)) {
+                                info.push(val.attributes.REF_NO)
+                       }
+                });
+            });*/
+    });
+    });
+
+
+}
 function addlayer(){
     
     geojson_layer = new OpenLayers.Layer.Vector( $("#idstate option:selected").text() , {
@@ -272,6 +400,7 @@ function toggleControl(element) {
             control.deactivate();
         }
     }
+    drawLayer.removeAllFeatures();
 }
 function onPopupClose(evt) {
         // 'this' is the popup.
@@ -314,9 +443,11 @@ function onFeatureSelectNav(evt) {
     }
 
 function onFeatureSelect(feature) {
+        fff=feature
         //map.div.style.cursor='wait';
         //setcursor();
         //setTimeout("document.body.style.cursor = 'wait'", 1);
+    if(feature.getVisibility()){
 	if (jQuery.inArray(feature.attributes.REF_NO, sitesSel) < 0) {
 		sitesSel.push(feature.attributes.REF_NO);
 		$( "#sites tbody" ).append( "<tr>" + 
@@ -330,6 +461,8 @@ function onFeatureSelect(feature) {
 		$("#selname").val("Selected Sites "+sitesSel.length);
 		$("#selinfo").dialog({ title: "" }).dialog('open');
 	}
+        drawLayer.removeAllFeatures();
+    }
         //setTimeout("document.body.style.cursor = 'auto'", 1);
         //setcursor();
        // map.div.style.cursor='wait';
@@ -524,25 +657,25 @@ function selview(i) {
 function highlightall() {
 	unHighlightAll();
 	for (i=0;i<=saveselsites.length;i++) {
-		floraStyles.styles.select.defaultStyle.fillColor=stylesColor[i];
+		siteStyles.styles.select.defaultStyle.fillColor=stylesColor[i];
 		$.each(siteLayer.features, function(key,val) {
 			if (jQuery.inArray(val.attributes.REF_NO, saveselsites[i]) > -1) {
 				selectControls.select.highlight(val);
 			}
 		});
 	}
-	floraStyles.styles.select.defaultStyle.fillColor="#F6358A";
+	siteStyles.styles.select.defaultStyle.fillColor="#F6358A";
 }
 
 function selhighlight(i) {
 	unHighlightAll();
-	floraStyles.styles.select.defaultStyle.fillColor=stylesColor[i];
+	siteStyles.styles.select.defaultStyle.fillColor=stylesColor[i];
 	$.each(siteLayer.features, function(key,val) {
 		if (jQuery.inArray(val.attributes.REF_NO, saveselsites[i]) > -1) {
 			selectControls.select.highlight(val);
 		}
 	});
-	floraStyles.styles.select.defaultStyle.fillColor="#F6358A";
+	siteStyles.styles.select.defaultStyle.fillColor="#F6358A";
 }
 
 function selzoom(i) {

@@ -83,6 +83,61 @@
 					</ul>
 
 					<div class="accordion" id="accordion2">
+                                                <div class="accordion-group">
+                                                        <div class="accordion-heading">
+                                                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#accord_filter">Filter Sites</a>
+                                                        </div>
+                                                        <div id="accord_filter" class="accordion-body collapse">
+                                                            <div class="accordion-inner">
+                                                                <h5>Aquifer</h5>
+                                                                <select id="idaquifer" class="span12"  size="5">
+                                                                    <option value="ALL">Show All</option>
+                                                                </select>
+                                                                <input id="show_aquifer" class="btn btn-info" type="checkbox" value="Show Aquifer">Show Aquifer</br>
+                                                                <h5>Site Type</h5>
+                                                                <select id="idfilter" class="span12"  size="5">
+                                                                    <option value="ALL">Show All</option>
+                                                                    <option value="ST">Stream</option>
+                                                                    <option value="STCA">&nbsp; &nbsp; Canal</option>
+                                                                    <option value="STDCH">&nbsp; &nbsp; Ditch</option>
+                                                                    <option value="LK">Lake</option>
+                                                                    <option value="SP">Spring</option>
+                                                                    <option value="GW">Well</option>
+                                                                    <option value="GWCR">&nbsp; &nbsp; Collector or Ranney type well</option>
+                                                                    <option value="GWMW">&nbsp; &nbsp; Multiple wells</option>
+                                                                    <option value="GWTH">&nbsp; &nbsp; Test hole</option>
+                                                                    <option value="SBTSM">Other subsurface</option>
+                                                                    <option value="SBTSM">&nbsp; &nbsp; Tunnel, shaft, or mine</option>
+                                                                    <option value="LAEX">Land</option>
+                                                                    <option value="LAEX">&nbsp; &nbsp; Excavation</option>
+                                                                    <option value="LASNK">&nbsp; &nbsp; Sinkhole</option>
+                                                                    <option value="LASH">&nbsp; &nbsp; Soil hole</option>
+                                                                    <option value="FACS">Facility</option>
+                                                                    <option value="FACS">&nbsp; &nbsp; Combined sewer</option>
+                                                                    <option value="FAQC">&nbsp; &nbsp; Laboratory or sample-prep area</option>
+                                                                    <option value="FALF">&nbsp; &nbsp; Landfill</option>
+                                                                    <option value="FAOF">&nbsp; &nbsp; Outfall</option>
+                                                                    <option value="FASTS">&nbsp; &nbsp; Storm sewer</option>
+                                                                    <option value="FAWTP">&nbsp; &nbsp; Water-supply treatment plant</option>
+                                                                </select><input id="search_filter" class="btn btn-info" type="button" value="Filter" />
+                                                                <input id="clear_filter" class="btn btn-info" type="button" value="Clear Filter" />
+                                                                <!--<select id="idaquifer" class="span12" multiple="multiple" size="5">
+                                                                </select><input id="search_aquifer" class="btn btn-info" type="button" value="Select" />-->
+                                                            </div>
+                                                        </div>
+
+                                                </div>
+                                                <!--<div class="accordion-group">
+                                                        <div class="accordion-heading">
+                                                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#accord_aquifer">Select Sites by Aquifer </a>
+                                                        </div>
+                                                        <div id="accord_aquifer" class="accordion-body collapse">
+                                                            <div class="accordion-inner">
+                                                                <select id="idaquifer" class="span12" multiple="multiple" size="5">
+                                                                </select><input id="search_aquifer" class="btn btn-info" type="button" value="Select" />
+                                                            </div>
+                                                        </div>
+                                                </div>-->
 						<div class="accordion-group">
 							<div class="accordion-heading">
 								<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#accordState">OWRB Layers </a>
