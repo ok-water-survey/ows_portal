@@ -107,11 +107,15 @@ $(window).load(function() {
 			var pointFeature = new OpenLayers.Feature.Vector(point, null, null);
                         var modtype = val.site_tp_cd.replace(/-/g, ''); 
                         var aqui='';
+                        var huc4='';
+                        var huc8='';
                         if(val.aquifer){
                          aqui = val.aquifer.replace(/-/g, '');
                          aqui=aqui.replace(/\s+/g, '');
                         }
-			pointFeature.attributes = {"REF_NO": val.site_no, "Sitename": val.station_nm, "State": "OK", "Year": val.status, "Area": val.agency_cd, "Taxon":modtype,'lat':val.dec_lat_va,'lon':val.dec_long_va,'aquifer':aqui};//al.aquifer};
+                        if(val.huc_4){ huc4=val.huc_4;}
+                        if(val.huc_8){ huc8=val.huc_8;}
+			pointFeature.attributes = {"REF_NO": val.site_no, "Sitename": val.station_nm, "State": "OK", "Year": val.status, "Area": val.agency_cd, "Taxon":modtype,'lat':val.dec_lat_va,'lon':val.dec_long_va,'aquifer':aqui,'huc_4':huc4,'huc_8':huc8};//al.aquifer};
 			siteLayer.addFeatures(pointFeature);
 			sitesActive.push(val.site_no);
 			
@@ -135,6 +139,7 @@ $(window).load(function() {
 
             });
         });
+        //set the select with Aquifer Names
         $.getJSON(baseurl +"/mongo/distinct/ows/aquifers/properties.NAME/{}/", function(fdata){
             fdata.sort();
             $.each(fdata, function(key,val) {
@@ -143,6 +148,30 @@ $(window).load(function() {
 
 
         });
+        //Set the select with Sub Watershed
+        $.getJSON(baseurl +"/mongo/distinct/ows/watersheds/properties.HUC/{}/", function(fdata){
+            fdata.sort();
+            var objdata;
+            $.getJSON(baseurl +"/mongo/db_find/ows/watersheds/{'fields':['properties']}/", function(objdata){
+                //console.log(odata);
+                //objdata=odata;
+                
+            //});
+                //console.log(objdata);
+                $.each(fdata, function(key,val) {
+                $.each(objdata, function(okey,oval) {
+                    //console.log(val);
+                    //console.log(oval);
+                    if(val == oval.properties.HUC){
+                        $('#idwatershed').append('<option value='+ oval.properties.HUC + '>'+ oval.properties.NAME +'</option>');
+                    }
+                });
+                });
+            });
+
+
+        });
+
 	map.addLayer( siteLayer );
 
 	map.addControl( new OpenLayers.Control.MousePosition({emptyString:"Floras Explorer"} ) );
@@ -258,6 +287,12 @@ $(document).ready( function() {
         $('#idaquifer').change(function(){
             display_aquifer();
         });
+        $("#show_watershed").change(function() {
+            display_watershed();
+        });
+        $('#idwatershed').change(function(){
+            display_watershed();
+        });
         $("#search_filter").click(function(){
             siteLayer.styleMap = myStyles1
             var filt = ''
@@ -282,7 +317,26 @@ $(document).ready( function() {
                     }
                 }
             }
-            alert(filt)
+            if($('#idwatershed').val()!=='ALL'){
+                if( $('#idwatershed').val()!==undefined ){
+                    if ( $('#idwatershed').val()!==null ){
+                        var temp = $('#idwatershed option:selected').val();
+                        var wshed_filter='';
+                        if (temp.length == 4){
+                            wshed_filter=  "huc_4 ='" +temp +"'"
+                        }else{
+                            wshed_filter=  "huc_8 ='" +temp +"'"
+                        }
+                        if(filt===''){
+                            filt = wshed_filter;
+                        }else{
+
+                            filt=filt + ' AND ' + wshed_filter;
+                        }
+                    }
+                }
+            }
+            //alert(filt)
             if (filt===''){
                 siteLayer.styleMap = siteStyles;
                 siteLayer.redraw();
@@ -321,7 +375,23 @@ $(document).ready( function() {
 function display_aquifer(){
    if($('#show_aquifer').attr('checked')?true:false){
         drawLayer.removeAllFeatures();
-        drawAquiferFeature();
+        $("#idaquifer option:selected").each(function (){
+            var url = baseurl + "/mongo/db_find/ows/aquifers/{'spec':{'properties.NAME':'" + $(this).text() + "'}}"
+            drawFeature(url);
+        });
+        //drawAquiferFeature();
+   }else{
+        drawLayer.removeAllFeatures();
+   }
+}
+function display_watershed(){
+   if($('#show_watershed').attr('checked')?true:false){
+        drawLayer.removeAllFeatures();
+        $("#idwatershed option:selected").each(function (){
+            var url = baseurl + '/mongo/db_find/ows/watersheds/{"spec":{"properties.HUC":"' + $(this).val() + '"}}'
+            drawFeature(url);
+        });
+        //drawAquiferFeature();
    }else{
         drawLayer.removeAllFeatures();
    }
@@ -340,12 +410,26 @@ function updateFilter(fltr) {
     }
     return false;
 }
+/*
 function drawAquiferFeature(){
+    $("#idaquifer option:selected").each(function (){
+    var url = baseurl + "/mongo/db_find/ows/aquifers/{'spec':{'properties.NAME':'" + $(this).text() + "'}}"
+    drawFeature(url);
+    });
+}
+function drawAquiferFeature(){
+    $("#idaquifer option:selected").each(function (){
+    var url = baseurl + "/mongo/db_find/ows/aquifers/{'spec':{'properties.NAME':'" + $(this).text() + "'}}"
+    drawFeature(url);
+    });
+}
+$('#idwatershed option').each( function(){ console.log(this.value)});
+
+*/
+function drawFeature(url){
     var in_options = {'internalProjection': map.projection,'externalProjection': map.projection};
     var geojson_format = new OpenLayers.Format.GeoJSON(in_options);
     drawLayer.removeAllFeatures();
-    $("#idaquifer option:selected").each(function (){
-    var url = baseurl + "/mongo/db_find/ows/aquifers/{'spec':{'properties.NAME':'" + $(this).text() + "'}}"
     $.getJSON(url, function(fdata) {
             var pre='{"type": "FeatureCollection","features":'
             var geosjon_str = pre + JSON.stringify(fdata) + '}'
@@ -354,7 +438,8 @@ function drawAquiferFeature(){
                 features = [features];
             }
             drawLayer.addFeatures(features);
-            /*aquifer = $('#idaquifer option:selected').text();
+            /*
+            watershed = $('#idwatershed option:selected').val();
             var info =[];
             $.each(drawLayer.features, function(key,f) {
                 $.each(siteLayer.features, function(key,val) {
@@ -362,10 +447,9 @@ function drawAquiferFeature(){
                                 info.push(val.attributes.REF_NO)
                        }
                 });
-            });*/
+            });
+            console.log(JSON.stringify({'HUC':watershed,'sites':info}));*/
     });
-    });
-
 
 }
 function addlayer(){
