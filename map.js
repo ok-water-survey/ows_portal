@@ -562,7 +562,10 @@ function showbib(ref_no) {
 		$("body").append('<div id="bibAll'+ref_no+'"></div>');
 		$("#bibAll"+ref_no).dialog({ height:'auto', width:'900px', position: [300,100], title: "<h3>Data</h3>", close: function() { $("#bibAll"+ref_no).remove(); } });
 		//$("#bibAll"+ref_no).append('<iframe id="iframe'+ref_no+'" src="http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no='+ref_no+'" width="100%" height="700"></iframe>');
-                $("#bibAll"+ref_no).append('<iframe id="iframe'+ref_no+'" src="/tools/usgs_metadata/'+ref_no+'" width="100%" height="700"></iframe>');
+                //$("#bibAll"+ref_no).load("/tools/usgs_metadata/"+ref_no);
+                //$("#bibAll"+ref_no).append('<div data-fragment="/tools/usgs_metadata/'+ref_no+'"</div>');
+                //fragment.render();
+               $("#bibAll"+ref_no).append('<iframe id="iframe'+ref_no+'" src="/tools/usgs_metadata/'+ref_no+'" width="100%" height="700"></iframe>');
 	}
 }
 function setcursor(){

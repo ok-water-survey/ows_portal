@@ -11,12 +11,11 @@
 <link rel=stylesheet href="http://test.cybercommons.org/flora/bootstrap/css/bootstrap-responsive.min.css" type="text/css" media="screen, print">
 <link rel=stylesheet href="http://test.cybercommons.org/flora/bootstrap/css/bootstrap.min.css" type="text/css" media="screen, print">
 <link rel=stylesheet href="http://static.cybercommons.org/css/bootstrap/css/cybercommons.css" type="text/css" media="screen, print">
-
+<script type="text/javascript" src="http://static.cybercommons.org/js/simpleCart.min.js"></script>
+<script type="text/javascript" src="https://raw.github.com/DanielRapp/fragment.js/master/fragment.js"></script>
 <script type="text/javascript" src="http://static.cybercommons.org/js/jquery-1.7.2.min.js"></script>
 <script type="text/javascript" src="http://static.cybercommons.org/js/jquery-ui-1.8.10.custom.min.js"></script>
 <script type="text/javascript" src="http://static.cybercommons.org/css/bootstrap/js/bootstrap.min.js"></script>
-<!--<script type="text/javascript" src="http://static.cybercommons.org/js/OpenLayers-2.12/OpenLayers.js"></script>-->
-<!--<script type="text/javascript" src="http://test.cybercommons.org/flora/OpenLayers-2.11/OpenLayers.js"></script>-->
 <script type="text/javascript" src="http://static.cybercommons.org/js/OpenLayers-2.11/OpenLayers.js"></script>
 <script type="text/javascript" src="http://static.cybercommons.org/js/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="http://static.cybercommons.org/js/flot/jquery.flot.selection.min.js"></script>
@@ -43,7 +42,6 @@
 						<li><a id="help" href="#">Help</a></li>
 					</ul>
 				</div>
-			
 				<ul class="nav pull-right">
 					<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Sign In <b class="caret"></b></a>
 						<div class="dropdown-menu">
@@ -51,13 +49,15 @@
 								<fieldset class="control-group">
 									<label for="form_username" class="control-label">Username</label>
 									<div class="input-prepend" style="white-space: nowrap">
-										<span class="add-on"><i class="icon-user"></i></span><input type="username" name="username" id="form_username" autocomplete="on" class="span2">
+				                                            <span class="add-on"><i class="icon-user"></i></span>
+                                                                            <input type="username" name="username" id="form_username" autocomplete="on" class="span2">
 									</div>
 								</fieldset>
 								<fieldset class="control-group">
 									<label for="form_password" class="control-label">Password</label>
 									<div class="input-prepend" style="white-space: nowrap">
-										<span class="add-on"><i class="icon-lock"></i></span><input type="password" name="password" id="form_password" class="span2">
+									    <span class="add-on"><i class="icon-lock"></i></span>
+                                                                            <input type="password" name="password" id="form_password" class="span2">
 									</div>
 								</fieldset>
 								<label class="checkbox"> <input type="checkbox" name="remember" value="true" /> Remember me
@@ -71,7 +71,21 @@
 				</ul>
 			</div>
 		</div>
-	</div>
+        </div>
+                <div id='header'>
+                    <div class="cartInfo"><span class="simpleCart_quantity"></span>&nbsp;items</div>
+                    <div id="cartPopover">
+                        <div id="triangle">▲</div>
+                        <div class="simpleCart_items"></div>
+                        <div id="cartData" class="clearfix">
+                            <div class="left"><strong>Data Items: </strong><span class="simpleCart_quantity">1</span></div>
+                        </div>
+                        <div id="popoverButtons" class="clearfix">
+                            <a href="javascript:;" class="simpleCart_checkout hudbtn primary right">Download</a>
+                        </div>
+                    </div>
+                </div>
+
 		
 	<div class="container-fluid">
 		<div class="row-fluid">
@@ -126,23 +140,10 @@
                                                                     <option value="FAWTP">&nbsp; &nbsp; Water-supply treatment plant</option>
                                                                 </select><input id="search_filter" class="btn btn-info" type="button" value="Filter" />
                                                                 <input id="clear_filter" class="btn btn-info" type="button" value="Clear Filter" />
-                                                                <!--<select id="idaquifer" class="span12" multiple="multiple" size="5">
-                                                                </select><input id="search_aquifer" class="btn btn-info" type="button" value="Select" />-->
                                                             </div>
                                                         </div>
 
                                                 </div>
-                                                <!--<div class="accordion-group">
-                                                        <div class="accordion-heading">
-                                                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#accord_aquifer">Select Sites by Aquifer </a>
-                                                        </div>
-                                                        <div id="accord_aquifer" class="accordion-body collapse">
-                                                            <div class="accordion-inner">
-                                                                <select id="idaquifer" class="span12" multiple="multiple" size="5">
-                                                                </select><input id="search_aquifer" class="btn btn-info" type="button" value="Select" />
-                                                            </div>
-                                                        </div>
-                                                </div>-->
 						<div class="accordion-group">
 							<div class="accordion-heading">
 								<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#accordState">OWRB Layers </a>
@@ -172,7 +173,7 @@
 						</div>
 					</div>
 
-					<img src="ows_logo1.png" alt="Floras Explorer" />
+					<img src="ows_logo1.png" alt="Oklahoma Water Survey" />
 
 				</div>
 				<div class="well alert-success">
@@ -267,8 +268,62 @@
             </div>
           </div>
 	</div>
-	
+<script>
+$(function() {
+    simpleCart({
+        //Setting the Cart Columns for the sidebar cart display.
+        cartColumns: [
+            //"<a href='javascript:;' class='simpleCart_increment'><img src='/assets/images/increment.png' title='+1' alt='arrow up'/></a>" +
+            //A custom cart column for putting the quantity and increment and decrement items in one div for easier styling.
+            { view: function(item, column){
+                return  "" + //"<span>"+item.get('quantity')+"</span>" + 
+                        "<div>" +
+                            "<a href='javascript:;' class='simpleCart_decrement'><img src='/assets/images/Trash-can.png' title='-1' alt='arrow down'/></a>" +
+                        "</div>";
+            }, attr: 'custom' },
+            //Name of the item
+            { attr: "name" , label: false },
+            //Subtotal of that row (quantity of that item * the price)
+           // { view: 'currency', attr: "total" , label: false  },
+           // { attr: "id" , label: false },
+            { attr:"query",label:false}
+        ],
+        cartStyle: 'div',
+        checkout: {
+              type: "SendForm" ,
+              url: "http://example.com/your/custom/checkout/url"
+          }
+    });
+simpleCart.bind( "beforeAdd" , function( item ){
+  // return false if the item is in the cart, 
+  // so it won't be added again
+  return !simpleCart.has(item);
+});
+$("#header .cartInfo").toggle(function(){
+        $('.item-query').hide();
+        $("#cartPopover").show();
+        $("#header .cartInfo").addClass('open');
+    }, function(){
+        $("#cartPopover").hide();
+        $("#header .cartInfo").removeClass('open');
+    });
+simpleCart.bind( 'update' , function(){
+    $(".item-query").hide();
+    $(".item-query").hide();
+    });
+$(window).bind('storage', function (e) {
+    simpleCart.load();
+    $(".item-query").hide();
+    $(".item-query").hide();
+  });
+$(window).scroll(function () { 
+     $("#cartPopover").offset({ left: window.scrollX + 876, top: window.scrollY + 65});
+});
+
+});    
+</script>
 </body>
+
 </html>
 
 
