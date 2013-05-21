@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html lang="en">
-<head>
+<html>
+<head lang="en">
 <meta charset="utf-8">
 <title>OWS - Data Portal</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,17 +12,28 @@
 <link rel=stylesheet href="http://test.cybercommons.org/flora/bootstrap/css/bootstrap.min.css" type="text/css" media="screen, print">
 <link rel=stylesheet href="http://static.cybercommons.org/css/bootstrap/css/cybercommons.css" type="text/css" media="screen, print">
 <script type="text/javascript" src="http://static.cybercommons.org/js/simpleCart.min.js"></script>
-<script type="text/javascript" src="https://raw.github.com/DanielRapp/fragment.js/master/fragment.js"></script>
+<!--<script type="text/javascript" src="https://raw.github.com/DanielRapp/fragment.js/master/fragment.js"></script>-->
 <script type="text/javascript" src="http://static.cybercommons.org/js/jquery-1.7.2.min.js"></script>
 <script type="text/javascript" src="http://static.cybercommons.org/js/jquery-ui-1.8.10.custom.min.js"></script>
+<script type="text/javascript" src="http://static.cybercommons.org/js/jquery.blockUI.js"></script>
 <script type="text/javascript" src="http://static.cybercommons.org/css/bootstrap/js/bootstrap.min.js"></script>
+<!--<script type="text/javascript" src="http://static.cybercommons.org/OpenLayers-2.12/OpenLayers.js"></script>-->
 <script type="text/javascript" src="http://static.cybercommons.org/js/OpenLayers-2.11/OpenLayers.js"></script>
 <script type="text/javascript" src="http://static.cybercommons.org/js/flot/jquery.flot.min.js"></script>
 <script type="text/javascript" src="http://static.cybercommons.org/js/flot/jquery.flot.selection.min.js"></script>
 <script type="text/javascript" src="http://test.cybercommons.org/flora/flotlabels/jquery.flot.axislabels.js"></script>
+<script type="text/javascript" src="http://static.cybercommons.org/js/bootstrap/bootstrap-tab.js"></script>
+
 <script src="http://maps.google.com/maps/api/js?v=3.6&amp;sensor=false&key=AIzaSyB1OApFshSYU6P8eUk7BpF6_oPMD9Du8yI"></script>
 <script type="text/javascript" src="map.js"></script>
+<script type="text/javascript" src="portal.js"></script>
+<script type="text/javascript" src="cctasks.js"></script>
 <link rel=stylesheet href="style.css" type="text/css" media="screen, print">
+<script>
+jQuery(document).ready(function ($) {
+        $('#myTab').tab();
+});
+</script>
 </head>
 <body>
 
@@ -78,24 +89,48 @@
                         <div id="triangle">▲</div>
                         <div class="simpleCart_items"></div>
                         <div id="cartData" class="clearfix">
-                            <div class="left"><strong>Data Items: </strong><span class="simpleCart_quantity">1</span></div>
+                            <div class="left"><strong>Total Data Items: </strong><span class="simpleCart_quantity">1</span></div>
                         </div>
                         <div id="popoverButtons" class="clearfix">
-                            <a href="javascript:;" class="simpleCart_checkout hudbtn primary right">Download</a>
+                            <div id="containspinner" style="float:left;padding-top:1px;width:20px;height:20px">
+                                <div id="spinner" style="float:left;"><img src="/static/img/spinner.gif" id="img-spinnger" alt="Loading" /></div>
+                            </div>
+                            <div id="status" class="label label-warning" style="line-height:2em;float:left;">Task Submitted</div>
+                            <a href="javascript:;" style="float:right;" class="simpleCart_checkout hudbtn primary right">Submit</a>
                         </div>
                     </div>
                 </div>
 
 		
 	<div class="container-fluid">
+            <ul id='myTab' class="nav nav-tabs">
+                <li class="active"><a href="#home" data-toggle="tab">Data Portal</a></li>   
+                <li><a href="#dashboard" data-toggle="tab">Watershed Dashboards</a></li>  
+            </ul>
+            <div id="myTabContent" class="tab-content" style="margin-bottom:0px">
+              <!--<div class="tab-pane active" id="home">
+                <p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor, williamsburg carles vegan helvetica. Reprehenderit butcher retro keffiyeh dreamcatcher synth. Cosby sweater eu banh mi, qui irure terry richardson ex squid. Aliquip placeat salvia cillum iphone. Seitan aliquip quis cardigan american apparel, butcher voluptate nisi qui.</p>
+              </div>
+              <div class="tab-pane" id="profile">
+                <p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1 labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit. Keytar helvetica VHS salvia yr, vero magna velit sapiente labore stumptown. Vegan fanny pack odio cillum wes anderson 8-bit, sustainable jean shorts beard ut DIY ethical culpa terry richardson biodiesel. Art party scenester stumptown, tumblr butcher vero sint qui sapiente accusamus tattooed echo park.</p>
+              </div>
+            </div>-->
+<div class="tab-pane active" id="home">
 		<div class="row-fluid">
 			<div class="span3">
 				<div class="well sidebar-nav">
 					<ul class="nav nav-list">
 						<li class="nav-header"><h4>Data Portal</h4>Search Options</li>
 						<li class="divider"></li>
-					</ul>
-
+                                                <li class="nav-header">Select Data Source</li>
+                                                <select id='select_sites'>
+                                                    <option value="USGS">USGS Active Sites</option>
+                                                    <option value="MESONET">Oklahoma Mesonet Sites</option>
+                                                    <option value="OWRBMW">OWRB Groundwater Monitor Wells</option>
+                                                </select>
+                                                <li class="nav-header">Current Filter</li>
+                                        <!--</ul>--><br>
+                                                <li class="nav-header"> Select Filter</li>
 					<div class="accordion" id="accordion2">
                                                 <div class="accordion-group">
                                                         <div class="accordion-heading">
@@ -113,7 +148,7 @@
                                                                     <option value="ALL">Show All</option>
                                                                 </select>
                                                                 <input id="show_aquifer" class="btn btn-info" type="checkbox" value="Show Aquifer">&nbsp;Show Aquifer</br>
-                                                                <h5>Site Type</h5>
+                                                                <h5 id="label5">Site Type</h5>
                                                                 <select id="idfilter" class="span12"  size="5">
                                                                     <option value="ALL">Show All</option>
                                                                     <option value="ST">Stream</option>
@@ -138,13 +173,29 @@
                                                                     <option value="FAOF">&nbsp; &nbsp; Outfall</option>
                                                                     <option value="FASTS">&nbsp; &nbsp; Storm sewer</option>
                                                                     <option value="FAWTP">&nbsp; &nbsp; Water-supply treatment plant</option>
-                                                                </select><input id="search_filter" class="btn btn-info" type="button" value="Filter" />
+                                                                </select>
+                                                                <select id="mesofilter" class="span12"  size="5">
+                                                                    <option value="ALL">Show All</option>
+                                                                    <option value="Panhandle">Panhandle</option>
+                                                                    <option value="NorthCentral">North Central</option>
+                                                                    <option value="Northeast">Northeast</option>
+                                                                    <option value="WestCentral">West Central</option>
+                                                                    <option value="Central">Central</option>
+                                                                    <option value="EastCentral">East Central</option>
+                                                                    <option value="Southwest">Southwest</option>
+                                                                    <option value="SouthCentral">South Central</option>
+                                                                    <option value="Southeast">Southeast</option>
+                                                                </select>
+                                                                <select id="owrbfilter" class="span12"  size="5">
+                                                                    <option value="ALL">Show All</option>
+                                                                </select>
+                                                                <input id="search_filter" class="btn btn-info" type="button" value="Filter" />
                                                                 <input id="clear_filter" class="btn btn-info" type="button" value="Clear Filter" />
                                                             </div>
                                                         </div>
 
                                                 </div>
-						<div class="accordion-group">
+						<div id="accord3" class="accordion-group">
 							<div class="accordion-heading">
 								<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#accordState">OWRB Layers </a>
 							</div>
@@ -172,7 +223,7 @@
 							</div>
 						</div>
 					</div>
-
+                                   </ul>
 					<img src="ows_logo1.png" alt="Oklahoma Water Survey" />
 
 				</div>
@@ -196,10 +247,20 @@
 			</div>
 		</div>
 
-		<hr>
-
+    </div><!--end of data portal tab-->
+    <div class="tab-pane" id="dashboard">
+            <h2>Oklahoma Watershed Dashboards</h2>
+                <ol id="waterdash" style="float:left;margin:10px;margin-left:50px;">
+                </ol>
+                <ol id="waterdash2" style="float:left;margin:10px;margin-left:100px;" start="6">
+                  </ol>
+                <ol id="waterdash3" style="float:left;margin:10px;margin-left:30px;" start="10">
+                    </ol>
+    </div><!--end of dashboard portal tab-->
+              </div>
+                <hr>
 		<footer>
-			<p>&copy; Oklahoma Water Survey 2012</p>
+			<p>&copy; Oklahoma Water Survey 2013</p>
 		</footer>
 
 	</div>
@@ -268,60 +329,7 @@
             </div>
           </div>
 	</div>
-<script>
-$(function() {
-    simpleCart({
-        //Setting the Cart Columns for the sidebar cart display.
-        cartColumns: [
-            //"<a href='javascript:;' class='simpleCart_increment'><img src='/assets/images/increment.png' title='+1' alt='arrow up'/></a>" +
-            //A custom cart column for putting the quantity and increment and decrement items in one div for easier styling.
-            { view: function(item, column){
-                return  "" + //"<span>"+item.get('quantity')+"</span>" + 
-                        "<div>" +
-                            "<a href='javascript:;' class='simpleCart_decrement'><img src='/assets/images/Trash-can.png' title='-1' alt='arrow down'/></a>" +
-                        "</div>";
-            }, attr: 'custom' },
-            //Name of the item
-            { attr: "name" , label: false },
-            //Subtotal of that row (quantity of that item * the price)
-           // { view: 'currency', attr: "total" , label: false  },
-           // { attr: "id" , label: false },
-            { attr:"query",label:false}
-        ],
-        cartStyle: 'div',
-        checkout: {
-              type: "SendForm" ,
-              url: "http://example.com/your/custom/checkout/url"
-          }
-    });
-simpleCart.bind( "beforeAdd" , function( item ){
-  // return false if the item is in the cart, 
-  // so it won't be added again
-  return !simpleCart.has(item);
-});
-$("#header .cartInfo").toggle(function(){
-        $('.item-query').hide();
-        $("#cartPopover").show();
-        $("#header .cartInfo").addClass('open');
-    }, function(){
-        $("#cartPopover").hide();
-        $("#header .cartInfo").removeClass('open');
-    });
-simpleCart.bind( 'update' , function(){
-    $(".item-query").hide();
-    $(".item-query").hide();
-    });
-$(window).bind('storage', function (e) {
-    simpleCart.load();
-    $(".item-query").hide();
-    $(".item-query").hide();
-  });
-$(window).scroll(function () { 
-     $("#cartPopover").offset({ left: window.scrollX + 876, top: window.scrollY + 65});
-});
-
-});    
-</script>
+       <!-- <div id='overlay'></div>-->
 </body>
 
 </html>

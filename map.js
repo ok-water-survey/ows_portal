@@ -9,12 +9,13 @@
 //Version 
 var verDate={"0":"0.01","1":"18 December 2012"};
 //Declarations
-var map, options, siteLayer, selectControls, siteStyles,drawLayer;
-var lay_osm,glayers
+var map,nav, options, siteLayer, selectControls, siteStyles,drawLayer;
+var lay_osm,glayers,mypop;
 var sitesTotal=[], sitesActive=[], sitesSel=[];
 var baseurl = "http://test.cybercommons.org";
 var selnum=0, saveselsites=[], saveseldata=[];
 var plot_data=[], selplot_data=[], plotDesc=[], plotselDesc=[];
+var loaded_sources=[]
 var savflg=0;
 var qry='';
 var enqry='';
@@ -22,7 +23,6 @@ var fff;
 var stylesColor={"0":"#0000ff","1":"#b575b5","2":"#f5914d","3":"#bd2126","4":"#8cba52","5":"#8cc4d6","6":"#007a63","7":"#705421","8":"#69c4ad","9":"#008000","10":"#000080","11":"#800080","12":"#c0c0c0"};
     // use a CQL parser for easy filter creation
     var format = new OpenLayers.Format.CQL();
-
     // this rule will get a filter from the CQL text in the form
     var rule = new OpenLayers.Rule({
         // We could also set a filter here.  E.g. #ff0000 #ffcccc
@@ -37,11 +37,31 @@ var stylesColor={"0":"#0000ff","1":"#b575b5","2":"#f5914d","3":"#bd2126","4":"#8
         }
     });
 
-
+var sources={'USGS':{'url':"/mongo/db_find/ows/usgs_site/{'spec':{'status':'Active'}}/",
+                     'mapping':{'REF_NO':'site_no','Sitename':'station_nm','Status': 'status',
+                                'SiteType':'site_tp_cd','lat':'dec_lat_va','lon':'dec_long_va',
+                                'aquifer':'aquifer','huc_4':'huc_4','huc_8':'huc_8'}
+                    },
+             'MESONET':{'url':"/mongo/db_find/ows/mesonet_site/{'spec':{'status':'Active'}}",
+                    'mapping':{'REF_NO':'stid','Sitename':'name','Status': 'status',
+                               'SiteType':'cdiv','lat':'nlat','lon':'elon',     
+                               'aquifer':'aquifer','huc_4':'huc_4','huc_8':'huc_8' }
+                       },
+             'OWRB':{'url':"/mongo/db_find/ows/%s/{'spec':{'COUNTY':'%s'}}",
+                    'mapping':{'REF_NO':'WELL_ID','Sitename':'name','Status': 'status',
+                               'SiteType':'USE_CLASS','lat':'LATITUDE','lon':'LONGITUDE',
+                               'aquifer':'aquifer','huc_4':'huc_4','huc_8':'huc_8' }
+                       },
+             'OWRBMW':{'url':"/mongo/db_find/ows/owrb_monitor_sites/{'spec':{'status':'Active'}}",
+                    'mapping':{'REF_NO':'WELL_ID','Sitename':'name','Status': 'status',
+                               'SiteType':'PROJECT','lat':'LATITUDE','lon':'LONGITUDE',
+                               'aquifer':'aquifer','huc_4':'huc_4','huc_8':'huc_8' }
+                       }
+            }
 
 //on window load
 $(window).load(function() {
-
+        console.log('Map.js start')
 	options = {
 		spericalMercator : true,
 		projection : new OpenLayers.Projection("EPSG:900913"),
@@ -74,10 +94,7 @@ $(window).load(function() {
             ),
             
         ];
-
 	map.addLayers(glayers); //[ccbasemap,lay_osm] );
-
-
 	center = new OpenLayers.LonLat(-98.5, 35);
 	center = center.transform(options.displayProjection,options.projection);
 	map.setCenter(center, 7);
@@ -94,44 +111,15 @@ $(window).load(function() {
         "default": new OpenLayers.Style({ fillOpacity: 1, fillColor: "#F6358A", graphicZIndex: 2 })
     });
     myStyles1 = new OpenLayers.StyleMap({"default": new OpenLayers.Style(null, {rules: [rule]})});
-    siteLayer = new OpenLayers.Layer.Vector("USGS Active Sites", {styleMap: myStyles1});
+    siteLayer = new OpenLayers.Layer.Vector("Sites", {styleMap: myStyles1});
 
 	$("#totmsg").show() .html("Loading . . .");
-	var st=[];
-	$.getJSON(baseurl + "/mongo/db_find/ows/usgs_site/{'spec':{'status':'Active'}}/", function(fdata) {
-		$.each(fdata, function(key,val) {
-			sitesTotal.push(val);
-			
-			var point = new OpenLayers.Geometry.Point(val.dec_long_va, val.dec_lat_va);
-			point = point.transform(options.displayProjection,options.projection);
-			var pointFeature = new OpenLayers.Feature.Vector(point, null, null);
-                        var modtype = val.site_tp_cd.replace(/-/g, ''); 
-                        var aqui='';
-                        var huc4='';
-                        var huc8='';
-                        if(val.aquifer){
-                         aqui = val.aquifer.replace(/-/g, '');
-                         aqui=aqui.replace(/\s+/g, '');
-                        }
-                        if(val.huc_4){ huc4=val.huc_4;}
-                        if(val.huc_8){ huc8=val.huc_8;}
-			pointFeature.attributes = {"REF_NO": val.site_no, "Sitename": val.station_nm, "State": "OK", "Year": val.status, "Area": val.agency_cd, "Taxon":modtype,'lat':val.dec_lat_va,'lon':val.dec_long_va,'aquifer':aqui,'huc_4':huc4,'huc_8':huc8};//al.aquifer};
-			siteLayer.addFeatures(pointFeature);
-			sitesActive.push(val.site_no);
-			
-			//$.each({"state":"OK"}, function(skey,sval) {
-			//	if (sval && $.inArray(sval, st)===-1) {
-			//		st.push(sval);
-			//	}
-			//});
-			
-		}); //end each
-				
-		
-		$("#totmsg").html("<table width='100%'><tr><td>Total Sites: <b>"+sitesTotal.length+"</b></td><td style='text-align:right;'><a href='#' class='btn btn-info btn-mini' onclick='window.location.reload();'>Clear Selected</a></td></tr></table>");
+//	var st=[];
+        load_sites(siteLayer,baseurl + sources['USGS'].url,'USGS',sources['USGS'].mapping);
+//        load_sites(siteLayer,baseurl + sources['MESONET'].url,'MESONET',sources['MESONET'].mapping);
+            //"/mongo/db_find/ows/usgs_site/{'spec':{'status':'Active'}}/","USGS"); 
 
-	}); //end getJSON
-         $.getJSON(baseurl + "/catalog/db_find/ows/data/{'spec':{'data_provider':'OWRB'},'fields':['sources']}/", function(fdata) {
+        $.getJSON(baseurl + "/catalog/db_find/ows/data/{'spec':{'data_provider':'OWRB'},'fields':['sources']}/", function(fdata) {
             $.each(fdata[0]['sources'], function(key,val) {
                 $.each(val,function (key1,val1){
                     $('#idstate').append('<option value='+val1.ows_url[0]+'>'+key + '-' + key1 +'</option>');
@@ -140,6 +128,8 @@ $(window).load(function() {
             });
         });
         //set the select with Aquifer Names
+        //console.log('right before Aquifer');
+
         $.getJSON(baseurl +"/mongo/distinct/ows/aquifers/properties.NAME/{}/", function(fdata){
             fdata.sort();
             $.each(fdata, function(key,val) {
@@ -152,33 +142,30 @@ $(window).load(function() {
         $.getJSON(baseurl +"/mongo/distinct/ows/watersheds/properties.HUC/{}/", function(fdata){
             fdata.sort();
             var objdata;
+           /// var objd ={};
             $.getJSON(baseurl +"/mongo/db_find/ows/watersheds/{'fields':['properties']}/", function(objdata){
-                //console.log(odata);
-                //objdata=odata;
-                
-            //});
-                //console.log(objdata);
                 $.each(fdata, function(key,val) {
                 $.each(objdata, function(okey,oval) {
-                    //console.log(val);
-                    //console.log(oval);
+          //          var objd ={};
                     if(val == oval.properties.HUC){
+                //        objd[oval.properties.HUC]=oval.properties.NAME
                         $('#idwatershed').append('<option value='+ oval.properties.HUC + '>'+ oval.properties.NAME +'</option>');
                     }
                 });
                 });
+
             });
+          //  console.log(objd)
 
 
         });
 
 	map.addLayer( siteLayer );
 
-	map.addControl( new OpenLayers.Control.MousePosition({emptyString:"Floras Explorer"} ) );
+	map.addControl( new OpenLayers.Control.MousePosition({emptyString:"Oklahoma Water Survey"} ) );
 	map.addControl( new OpenLayers.Control.LayerSwitcher() );
 	map.addControl( new OpenLayers.Control.ScaleLine() );
 	map.addControl( new OpenLayers.Control.OverviewMap());
-//"default": new OpenLayers.Style({ display: 'none' })	
 	selStyle = new OpenLayers.StyleMap({
                 "default": new OpenLayers.Style({ display: 'none' })
         });	
@@ -216,11 +203,15 @@ $(window).load(function() {
     
 	document.getElementById("noneToggle").checked=true;
 	selectControls.select.activate();
-   
+    //Disable zoomWheel
+    controls = map.getControlsByClass('OpenLayers.Control.Navigation');
+    for(var i = 0; i < controls.length; ++i)
+        controls[i].disableZoomWheel(); 
+console.log('Map.js load finish')
 }); //end window Load
 
 $(document).ready( function() {
-
+        console.log('Map.js ready start')
 	$("#map").resizable();
 
 	$('#about').click(function(){
@@ -295,13 +286,23 @@ $(document).ready( function() {
         });
         $("#search_filter").click(function(){
             siteLayer.styleMap = myStyles1
-            var filt = ''
-            if($('#idfilter').val()!=='ALL'){
-                if($('#idfilter').val()!== undefined){
-                    if($('#idfilter').val()!== null){
-                        filt = "Taxon = '" + $('#idfilter').val() +"'"
+            var filt = "Source = '" + $('#select_sites').val() + "'"
+            if ($('#select_sites').val()=="MESONET"){
+                if($('#mesofilter').val()!=='ALL'){
+                    if($('#mesofilter').val()!== undefined){
+                        if($('#mesofilter').val()!== null){
+                            filt = filt + " AND SiteType = '" + $('#mesofilter').val() +"'"
+                        }
                     }
-                }               
+                }
+            }else{
+                if($('#idfilter').val()!=='ALL'){
+                    if($('#idfilter').val()!== undefined){
+                        if($('#idfilter').val()!== null){
+                            filt = filt + " AND SiteType = '" + $('#idfilter').val() +"'"
+                        }
+                    }               
+                }
             }
             if($('#idaquifer').val()!=='ALL'){
                 if( $('#idaquifer').val()!==undefined ){
@@ -370,8 +371,57 @@ $(document).ready( function() {
 	$('.dropdown input, .dropdown label').click(function(e) {
 		e.stopPropagation();
 	});
-
+console.log('Map.js ready stop')
 }); //end document ready
+function load_sites(layer,url,source,mapping){
+    loaded_sources.push(source);
+        var mess='Loading.... ' + $('#select_sites option:selected').text() 
+        $.blockUI({ message:mess,css: {
+                    border: 'none',
+                    padding: '15px',
+                    backgroundColor: '#000',
+                    '-webkit-border-radius': '10px',
+                    '-moz-border-radius': '10px',
+                    opacity: .5,
+                    color: '#fff'
+                 } });
+    $.getJSON(url, function(fdata) {
+                $.each(fdata, function(key,val) {
+                        sitesTotal.push(val);
+
+                        var point = new OpenLayers.Geometry.Point(val[mapping.lon], val[mapping.lat]);
+                        point = point.transform(options.displayProjection,options.projection);
+                        var pointFeature = new OpenLayers.Feature.Vector(point, null, null);
+                        var modtype = val[mapping.SiteType].replace(/-/g, '');//.site_tp_cd.replace(/-/g, '');
+                        modtype=modtype.replace(/\s+/g, '');
+                        var aqui='';
+                        var huc4='';
+                        var huc8='';
+                        if(val[mapping.aquifer]){
+                         aqui = val[mapping.aquifer].replace(/-/g, '');//.aquifer.replace(/-/g, '');
+                         aqui=aqui.replace(/\s+/g, '');
+                        }
+                        if(val[mapping.huc_4]){ huc4=val[mapping.huc_4];}//.huc_4;}
+                        if(val[mapping.huc_8]){ huc8=val[mapping.huc_8];}//.huc_8;}
+                        pointFeature.attributes = {"REF_NO": val[mapping.REF_NO], "Sitename": val[mapping.Sitename], "State": "OK", "Status": val[mapping.Status], 
+                                                    "Source": source, "SiteType":modtype,'lat':val[mapping.lat],'lon':val[mapping.lon],
+                                                    'aquifer':aqui,'huc_4':huc4,'huc_8':huc8};
+                //        console.log(pointFeature.attributes);
+                        layer.addFeatures(pointFeature);
+                        sitesActive.push(val[mapping.REF_NO]);
+
+                }); //end each
+                 $("#totmsg").html("<table width='100%'><tr><td>Total Sites: <b>"+ sitesTotal.length +
+                    "</b></td><td style='text-align:right;'><a href='#' class='btn btn-info btn-mini' onclick='window.location.reload();'>Clear Selected</a></td></tr></table>");
+            $.unblockUI();
+        }); //end getJSON
+}
+function check_sources(source){
+    
+
+
+
+}
 function display_aquifer(){
    if($('#show_aquifer').attr('checked')?true:false){
         drawLayer.removeAllFeatures();
@@ -404,6 +454,7 @@ function updateFilter(fltr) {
         alert(err.message);
     }
     if (filter) {
+        //alert("apply filter");
         //output.value = "";
         rule.filter = filter;
         siteLayer.redraw();
@@ -499,18 +550,24 @@ function onPopupClose(evt) {
 function onFeatureSelectNav(evt) {
         feature = evt.feature;
         //new OpenLayers.Size(600,200)  feature.geometry.getBounds().getCenterLonLat()
+        content ="<b>"+feature.attributes.Sitename + "</b><table class='table-condensed' style='margin-bottom:5px;margin-right:10px;'>" +
+                 "<tr><th>ID</th><td>"+feature.attributes.REF_NO + "</td></tr>" +
+                 "<tr><th>Type</th><td>"+feature.attributes.SiteType + "</td></tr>" +
+                 "<tr><th>Status</th><td>"+feature.attributes.Status + "</td></tr>" +
+                 "<tr><td colspan='2'><a style='color:blue;' href='#' onclick='showbib("+'"'+feature.attributes.REF_NO+'"'+")'>Data Access</a></td></tr>" +
+                 "<tr><td colspan='2'><a style='color:blue;' href='http://maps.google.com/maps?z=15&t=k&q=loc:"+feature.attributes.lat + "," + feature.attributes.lon +
+                 "' target='_blank'>Google Maps</a></td></tr></table>"
         popup = new OpenLayers.Popup.FramedCloud("featurePopup", feature.geometry.getBounds().getCenterLonLat(),new OpenLayers.Size(100,100),
-                "<b>"+feature.attributes.Sitename + "</b><table class='table-condensed' style='margin:5px;'>" +
-                "<tr><th>ID</th><td>"+feature.attributes.REF_NO + "</td></tr>" +
-                "<tr><th>Type</th><td>"+feature.attributes.Taxon + "</td></tr>" +
-                "<tr><th>Status</th><td>"+feature.attributes.Year + "</td></tr>" +
-                "<tr><td colspan='2'><a style='color:blue;' href='#' onclick='showbib("+'"'+feature.attributes.REF_NO+'"'+")'>Data Access</a></td></tr>" +
-                "<tr><td colspan='2'><a style='color:blue;' href='http://maps.google.com/maps?z=15&t=k&q=loc:"+feature.attributes.lat+","+feature.attributes.lon+"' target='_blank'>Google Maps</a></td></tr></table>" ,
-                null, true, onPopupClose);
+                                                 content , null, true, onPopupClose);
         popup.panMapIfOutOfView = true;
+        
+       // popup.calculateRelativePosition = function () {
+       //     return 'tr';
+       // }
         popup.autoSize = true;
         feature.popup = popup;
         popup.feature = feature;
+        mypop = popup;
         map.addPopup(popup, true);
 
         //var id = (feature.attributes.loc_id) ? feature.attributes.loc_id : '';
@@ -537,9 +594,9 @@ function onFeatureSelect(feature) {
 		$( "#sites tbody" ).append( "<tr>" + 
 				"<td>" + feature.attributes.REF_NO + "</td>" + 
 				"<td><a style='color:#08C;' href='#' onclick='showbib("+'"'+feature.attributes.REF_NO+'"'+");'>" + feature.attributes.Sitename + "</a></td>" +
-				"<td style='text-align:center;'>" + feature.attributes.Year + "</td>" + 
-				"<td style='text-align:right;'>" + feature.attributes.Area + "</td>" + 
-				"<td style='text-align:right;'>" + feature.attributes.Taxon + "</td>" + 
+				"<td style='text-align:center;'>" + feature.attributes.Status + "</td>" + 
+				"<td style='text-align:right;'>" + feature.attributes.Source + "</td>" + 
+				"<td style='text-align:right;'>" + feature.attributes.SiteType + "</td>" + 
 				"</tr>"
 		); 
 		$("#selname").val("Selected Sites "+sitesSel.length);
@@ -558,6 +615,7 @@ function executeFunctionWithCursor(){
     setTimeout("document.body.style.cursor = 'auto';map.div.style.cursor='default';", 1);
 }
 function showbib(ref_no) {
+        var source = $('#select_sites').val().split("_");
 	if ($("#bibAll"+ref_no).length < 1) {
 		$("body").append('<div id="bibAll'+ref_no+'"></div>');
 		$("#bibAll"+ref_no).dialog({ height:'auto', width:'900px', position: [300,100], title: "<h3>Data</h3>", close: function() { $("#bibAll"+ref_no).remove(); } });
@@ -565,7 +623,15 @@ function showbib(ref_no) {
                 //$("#bibAll"+ref_no).load("/tools/usgs_metadata/"+ref_no);
                 //$("#bibAll"+ref_no).append('<div data-fragment="/tools/usgs_metadata/'+ref_no+'"</div>');
                 //fragment.render();
+            if ($('#select_sites').val() == 'MESONET'){
+                $("#bibAll"+ref_no).append('<iframe id="iframe'+ref_no+'" src="/tools/usgs_metadata/'+ref_no+'?source=MESONET" width="100%" height="700"></iframe>');
+            }else if (source[0]=='OWRB'){
+                $("#bibAll"+ref_no).append('<iframe id="iframe'+ref_no+'" src="/tools/usgs_metadata/'+ref_no+'?source=OWRB" width="100%" height="700"></iframe>');
+            }else if ($('#select_sites').val() == 'OWRBMW'){
+                $("#bibAll"+ref_no).append('<iframe id="iframe'+ref_no+'" src="/tools/usgs_metadata/'+ref_no+'?source=OWRBMW" width="100%" height="700"></iframe>');
+            }else{
                $("#bibAll"+ref_no).append('<iframe id="iframe'+ref_no+'" src="/tools/usgs_metadata/'+ref_no+'" width="100%" height="700"></iframe>');
+            }
 	}
 }
 function setcursor(){
@@ -676,69 +742,10 @@ function viewall() {
 }
 
 function selview(i) {
-        //alert (saveselsites[i]);
-        //alert(saveseldata[i]);
-        //map.div.style.cursor  = 'wait'; 
 	$("#sites tbody").empty();
         $("#sites").append(saveseldata[i]);
-	//$.each(saveselsites[i], function(key,val) {
-                /*
-		var found=0;
-                alert(val);
-		$.each(siteLayer.features, function(key2,val2) {
-			if (val===val2.attributes.REF_NO) {
-				found=1;
-                                alert('found');
-				$( "#sites tbody" ).append( "<tr>" + 
-						"<td>" + val2.attributes.REF_NO + "</td>" + 
-						"<td><a style='color:#08C;' href='#' onclick='showbib("+'"'+parseInt(val2.attributes.REF_NO)+'"'+");'>" + val2.attributes.Sitename + "</a></td>" +
-						"<td style='text-align:center;'>" + val2.attributes.Year + "</td>" + 
-						"<td style='text-align:right;'>" + val2.attributes.Area + "</td>" + 
-						"<td style='text-align:right;'>" + val2.attributes.Taxon + "</td>" + 
-						"</tr>"
-				); 
-			}
-		});
-		if (! found) {
-                    alert('not found');*/
-                    /*var durl ="http://test.cybercommons.org/mongo/db_find/flora/adv_search/{'spec':{'Label':"+parseInt(val)+"},'fields':['Label','ShortTitle','REF_NO','Sitename','Year','NO_Species','Area_hectares']}/?callback=?";
-                    $.getJSON(durl, function(data) {
-                        $.each(data, function(key3,val3) {
-                            if (val3.REF_NO == null){
-                            $( "#sites tbody" ).append( "<tr>" + 
-                                          "<td>" + parseInt(val) + "</td>" + 
-                                          "<td><a style='color:#08C;' href='#' onclick='showbib("+'"'+parseInt(val)+'"'+");'>" + val3.ShortTitle + "</a></td>" +
-                                          "<td style='text-align:center;'>" + val3.Year  + "</td>" +
-                                          "<td style='text-align:right;'>N/A</td>" +
-                                          "<td style='text-align:right;'>N/A</td>" +
-                                          "</tr>"
-                          );
-                            }else{
-                            $( "#sites tbody" ).append( "<tr>" +
-                                          "<td>" + parseInt(val) + "</td>" +
-                                          "<td><a style='color:#08C;' href='#' onclick='showbib("+'"'+parseInt(val)+'"'+");'>" + val3.Sitename + "</a></td>" +
-                                          "<td style='text-align:center;'>" + val3.Year  + "</td>" +
-                                          "<td style='text-align:right;'>" + val3.Area_hectares + "</td>" +
-                                          "<td style='text-align:right;'>" + val3.NO_Species +"</td>" +
-                                          "</tr>"
-                          );
-                            }
-
-                        });
-                    });*/
-	/*		$( "#sites tbody" ).append( "<tr>" + 
-					"<td>" + val + "</td>" + 
-					"<td><a style='color:#08C;' href='#' onclick='showbib("+'"'+parseInt(val)+'"'+");'>" + val + "</a></td>" +
-					"<td style='text-align:center;'>N/A</td>" + 
-					"<td style='text-align:right;'>N/A</td>" + 
-					"<td style='text-align:right;'>N/A</td>" + 
-					"</tr>"
-			);*/ 
-		//}
-	//});
 	$("#seldivname").hide();
 	$("#selinfo").dialog({ title: $("#bname"+i).html() }).dialog('open');
-        //map.div.style.cursor  = 'default';
 }
 
 function highlightall() {

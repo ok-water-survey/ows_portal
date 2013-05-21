@@ -16,29 +16,32 @@ taskdesc = {
 
 */
 // Called by call task to poll queue status of task based on task_id
-var QUEUE_SUBMIT = 'http://test.oklahomawatersurvey.org/queue/run/'
+var QUEUE_SUBMIT = 'http://test.oklahomawatersurvey.org/queue/run/';
+var QUEUE_POLL =  'http://test.oklahomawatersurvey.org/queue/task/';
 
 function test_auth_tkt() {
-    $("#auth_dialog").hide()
+    $("#auth_dialog").hide();
     if ($.cookie('auth_tkt') ) {
         $('#auth_message').html("you're logged in")
     }
     else {
         $("#auth_dialog").dialog( { height:200, modal: true} );
         $("#auth_dialog").dialog("open");
-        $('#auth_message').html('Please <a href="http://test.cybercommons.org/accounts/login/">login</a> to track your tasks via the cybercommons').addClass('label warning')
+        $('#auth_message').html('Please <a href="http://test.cybercommons.org/accounts/login/">login</a> to track your tasks via the cybercommons').addClass('label warning');
     }
 
 }
 
 
 
-function poll_status(task_id) {
-    $.getJSON('http://test.cybercommons.org/queue/task/' + task_id + '?callback=?', function (data) {
+function poll_status(args) {
+    $.getJSON(args.host + args.task_id + '?callback=?', function (data) {
         if (data.status == "PENDING") {
-            options.onPending(task_id);
+            options.onPending(args);
         } else if (data.status == "FAILURE") {
             options.onFailure(data);
+        } else if (data.status == "Error"){
+            options.onFailure(data); 
         } else if (data.status == "SUCCESS") {
             options.onSuccess(data);
         }
@@ -48,34 +51,37 @@ function poll_status(task_id) {
 function calltask(taskdesc) {
     defaults = {
         "service_host": QUEUE_SUBMIT,
+        "poll_target": QUEUE_POLL,
         "status": '#status',
         "spinner": '#spinner',
         "pollinterval": 2000,
         "onPending": function (task_id) {
+            $(options.status).show();
+            $(options.status).removeClass('label label-success label-warning label-important').addClass('label label-warning');
+            $(options.status).text("Working...");
+            $(options.spinner).show();
             setTimeout(function () {
                 poll_status(task_id);
             }, options.pollinterval);
-            $(options.status).show();
-            $(options.status).removeClass('label success warning important').addClass('label warning');
-            $(options.status).text("Working...");
-            $(options.spinner).show();
         },
         "onFailure": function (data) {
             $(options.status).show();
-            $(options.status).removeClass('label success warning important').addClass('label important');
+            $(options.status).removeClass('label label-success label-warning label-important').addClass('label label-important');
             $(options.status).text("Task failed!");
             $(options.spinner).hide();
         },
         "onSuccess": function (data) {
             $(options.status).show();
-            $(options.status).removeClass('label success warning important').addClass('label success');
-            $(options.status).html('<a href="' + data.tombstone[0].result + '">Download</a>');
+            $(options.status).removeClass('label label-success label-warning label-important').addClass('label label-success');
+            $(options.status).html('<a href="'+ data.tombstone[0].result + '">Download</a>');
             $(options.spinner).hide();
+            simpleCart.empty();
         },
     }
     options = $.extend(true, {}, defaults, taskdesc)
 
-    var taskparams = ""
+    var taskparams = "";
+
     if (options.params) {
         for (item in options.params) {
             taskparams = taskparams.concat('/' + options.params[item]);
@@ -85,21 +91,28 @@ function calltask(taskdesc) {
             taskparams = taskparams.concat('/' + $(options.uiparams[item]).val());
         }
     }
-    var taskcall = ""
+    var kwargs ="?";
+    if(options.kwargs) {
+        for (var key in options.kwargs){
+            kwargs=kwargs + key + '=' + options.kwargs[key] + '&';
+        }
+    }
+    var taskcall = "";
     if (options.taskq) {
         taskcall = options.taskname + '@' + options.taskq;
     } else {
         taskcall = options.taskname;
     }
 
-    var request = options.service_host + taskcall + taskparams;
-
-    $.getJSON(request + '?callback=?', function (data) {
+    var request = options.service_host + taskcall + taskparams + kwargs;
+    $.getJSON(request + 'callback=?', function (data) {
         $(options.status).text('Task submitted...');
         var task_id = data.task_id;
         setTimeout(function () {
-            poll_status(task_id);
+            var poll = {};
+            poll.host = options.poll_target;
+            poll.task_id = task_id;
+            poll_status(poll);
         }, taskparams.pollinterval);
     });
 }
-
