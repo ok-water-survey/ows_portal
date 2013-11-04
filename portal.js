@@ -73,15 +73,11 @@ $(function() {
   $('#select_sites').change(function() {
         var source = $('#select_sites').val().split("_");
         var filt = "Source = '" + $('#select_sites').val() + "'";
+        removeFilter(2);
     if ($.inArray($('#select_sites').val(),loaded_sources)>-1){
-  //      siteLayer.styleMap = siteStyles;
-  //      alert(filt);
         updateFilter(filt);
         siteLayer.redraw();
     }else{
-//        siteLayer.styleMap = siteStyles;
-//        siteLayer.redraw();
-        //updateFilter(filt);
         if (source[0]==='OWRB'){
             var myurl=baseurl + sources[source[0]].url;
             var part_url=myurl.split('%s');
@@ -90,27 +86,44 @@ $(function() {
         }else{
             load_sites(siteLayer,baseurl + sources[$('#select_sites').val()].url,$('#select_sites').val(),sources[$('#select_sites').val()].mapping);
         }
-        updateFilter(filt);
-        siteLayer.redraw();
-        //loaded_sources.push($('#select_sites').val())
-        //alert('loaded once');
-        //load_sites(siteLayer,baseurl + "/mongo/db_find/ows/usgs_site/{'spec':{'status':'Active'}}/","USGS");
-        //alert('not in load_sources'  + $('#select_sites').val());
+        apply_current();
+        apply_filter();
+        //updateFilter(filt);
+        //siteLayer.redraw();
     }
     if ($('#select_sites').val()=='MESONET'){
         $('#label5').text('Climate Division');
         $('#idfilter').hide();
         $('#mesofilter').show();
-    }else{
+        $('#owrbfilter').hide();
+        $('#owrbmw').hide();
+    }else if ($('#select_sites').val()=='USGS'){
         $('#label5').text('Site Type');
         $('#idfilter').show();
         $('#mesofilter').hide();
-    }
+        $('#owrbfilter').hide();
+        $('#owrbmw').hide();
+    }else if (source[0]==='OWRB'){
+        $('#label5').text('Well Type');
+        $('#idfilter').hide();
+        $('#mesofilter').hide();
+        $('#owrbfilter').show();
+        $('#owrbmw').hide();
+    }else if ($('#select_sites').val()=='OWRBMW'){
+        $('#label5').text('Groundwater Well Project');
+        $('#idfilter').hide();
+        $('#mesofilter').hide();
+        $('#owrbfilter').hide();
+        $('#owrbmw').show();
+    }   
   });
   load_welllog_types();
+  load_owrbmw_types();
   load_well_log_sites();
   $('#accord3').hide();
   $('#mesofilter').hide();
+  $('#owrbfilter').hide();
+  $('#owrbmw').hide();
   load_dash();
 });
 function load_welllog_types(){
@@ -122,12 +135,21 @@ function load_welllog_types(){
     });
   });
 }
+function load_owrbmw_types(){
+    var url = baseurl + "/mongo/distinct/ows/owrb_monitor_sites/PROJECT/{}/"
+    $.getJSON(url, function(fdata) {
+    $.each(fdata.sort(), function(key,val) {
+        $('#owrbmw').append('<option value='+ val.replace(/\s+/g, '').replace(/-/g, '') + '>'+ val  + '</option>');
+
+    });
+  });
+}
 function load_well_log_sites(){
   var url = baseurl + "/mongo/distinct/ows/owrb_well_logs/COUNTY/{}/"
  
   $.getJSON(url, function(fdata) {
     $.each(fdata.sort(), function(key,val) {
-        console.log(val);
+        //console.log(val);
         $('#select_sites').append('<option value="OWRB_'+ val.replace(/\s+/g, '') + '">OWRB - Well Logs ('+ val  + ' County)</option>'); 
 
     });

@@ -24,6 +24,14 @@ visibility:hidden;
     opacity: 1;
     z-index=800;
 }
+/* MVC style inclusion */
+#watershd ul{
+    list-style-type: none;
+    font-size: 12px;
+    margin: 0 0 0 6px;
+}
+
+
 /*simple cartjs*/
 .cartInfo{
       /*float:right;*/

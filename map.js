@@ -12,7 +12,7 @@ var verDate={"0":"0.01","1":"18 December 2012"};
 var map,nav, options, siteLayer, selectControls, siteStyles,drawLayer;
 var lay_osm,glayers,mypop;
 var sitesTotal=[], sitesActive=[], sitesSel=[];
-var baseurl = "http://test.cybercommons.org";
+var baseurl = "" //"http://test.cybercommons.org";
 var selnum=0, saveselsites=[], saveseldata=[];
 var plot_data=[], selplot_data=[], plotDesc=[], plotselDesc=[];
 var loaded_sources=[]
@@ -58,10 +58,11 @@ var sources={'USGS':{'url':"/mongo/db_find/ows/usgs_site/{'spec':{'status':'Acti
                                'aquifer':'aquifer','huc_4':'huc_4','huc_8':'huc_8' }
                        }
             }
-
+var filter={'watershed':null,'aquifer':null,'type':null};
+var cfilter={'watershed':null,'aquifer':null,'type':null};
 //on window load
 $(window).load(function() {
-        console.log('Map.js start')
+        //console.log('Map.js start')
 	options = {
 		spericalMercator : true,
 		projection : new OpenLayers.Projection("EPSG:900913"),
@@ -105,10 +106,10 @@ $(window).load(function() {
 
 	siteStyles = new OpenLayers.StyleMap({
         "default": new OpenLayers.Style({ fillOpacity: 1, pointRadius: 3.5, strokeWidth: 1, fillColor: "#8CBA52", graphicZIndex: 1 }),
-        "select": new OpenLayers.Style({ fillOpacity: 1, fillColor: "#F6358A", graphicZIndex: 2 })
+        "select": new OpenLayers.Style({ fillOpacity: 0.2, fillColor: "#F6358A", graphicZIndex: 2 })
     });
         myStyles = new OpenLayers.StyleMap({
-        "default": new OpenLayers.Style({ fillOpacity: 1, fillColor: "#F6358A", graphicZIndex: 2 })
+        "default": new OpenLayers.Style({ fillOpacity: 0.2, fillColor: "#F6358A", graphicZIndex: 2 })
     });
     myStyles1 = new OpenLayers.StyleMap({"default": new OpenLayers.Style(null, {rules: [rule]})});
     siteLayer = new OpenLayers.Layer.Vector("Sites", {styleMap: myStyles1});
@@ -139,26 +140,51 @@ $(window).load(function() {
 
         });
         //Set the select with Sub Watershed
-        $.getJSON(baseurl +"/mongo/distinct/ows/watersheds/properties.HUC/{}/", function(fdata){
-            fdata.sort();
-            var objdata;
-           /// var objd ={};
-            $.getJSON(baseurl +"/mongo/db_find/ows/watersheds/{'fields':['properties']}/", function(objdata){
-                $.each(fdata, function(key,val) {
-                $.each(objdata, function(okey,oval) {
-          //          var objd ={};
-                    if(val == oval.properties.HUC){
-                //        objd[oval.properties.HUC]=oval.properties.NAME
-                        $('#idwatershed').append('<option value='+ oval.properties.HUC + '>'+ oval.properties.NAME +'</option>');
+        $.getJSON(baseurl +"/catalog/db_find/ows/data/%7B'spec':%7B'data_provider':'Watersheds'%7D%7D",function(fdata){
+            $.each(fdata[0], function(key,val) {
+                try{
+                    if(val.name!==undefined){
+                    $('#idwatershed').append('<option value='+ key + '>'+ val.name +'</option>');
+                    $.each(val.subs,function(k,v){
+                        $('#idwatershed').append('<option value='+ k + '>&nbsp;&nbsp; - '+ v +'</option>');
+                    })
                     }
-                });
-                });
+                }catch(err){
+                var msg ="error";
+                }
 
             });
+        });
+//        $.getJSON(baseurl +"/mongo/distinct/ows/watersheds/properties.HUC/{}/", function(fdata){
+//            fdata.sort();
+//            var objdata,oval,huc,temp;
+           /// var objd ={};
+//            $.each(fdata, function(key,val) {
+               // alert(val);
+//                var url = baseurl +"/mongo/db_find/ows/watersheds/{'spec':{'properties.HUC':'" + $.trim(val) + "'},'fields':['properties']}/"
+//                $.getJSON(url, function(objdata){
+                //  alert(url);
+                //$.each(fdata, function(key,val) {
+                    //$.each(objdata, function(okey,oval) {
+                     //   alert(oval.properties.NAME);
+                    //          var objd ={};
+//                        oval = objdata[0].properties.NAME
+//                        huc= objdata[0].properties.HUC
+                        //if(val == oval.properties.HUC){
+                        //        objd[oval.properties.HUC]=oval.properties.NAME
+//                        temp= '<a onclick="addFilter("' + huc + '");" href="javascript:void(0);"> '+ oval +'</a>';
+                        // $('#idwatershed_ul').append('<li><a onclick="addFilter("' + huc + '");" href="javascript:void(0);"> '+ oval +'</a>');
+                        //alert(temp);
+//                        $('#idwatershed').append('<option value='+ huc + '>'+ oval +'</option>');
+                       // }
+                    //});
+//                });
+
+            //});
           //  console.log(objd)
 
 
-        });
+//        });
 
 	map.addLayer( siteLayer );
 
@@ -207,11 +233,11 @@ $(window).load(function() {
     controls = map.getControlsByClass('OpenLayers.Control.Navigation');
     for(var i = 0; i < controls.length; ++i)
         controls[i].disableZoomWheel(); 
-console.log('Map.js load finish')
+//console.log('Map.js load finish')
 }); //end window Load
 
 $(document).ready( function() {
-        console.log('Map.js ready start')
+        //console.log('Map.js ready start')
 	$("#map").resizable();
 
 	$('#about').click(function(){
@@ -284,6 +310,55 @@ $(document).ready( function() {
         $('#idwatershed').change(function(){
             display_watershed();
         });
+        $('#idfilter').dblclick(function(){
+            type_filter('idfilter');
+        });
+        $('#mesofilter').dblclick(function(){
+            type_filter('mesofilter');
+        });
+       $('#owrbfilter').dblclick(function(){
+            type_filter('owrbfilter');
+        });
+       $('#owrbmw').dblclick(function(){
+            type_filter('owrbmw');
+        });
+        
+        $('#idwatershed').dblclick(function(){
+            var temp ='';// $('#idwatershed option:selected').val();
+            var wshed_filter=[];//'';
+            $.each($('#idwatershed option:selected'),function(key,item){
+                temp=item.value
+                if (temp.length == 4){
+                    //wshed_filter=  "huc_4 ='" +temp +"'"
+                    wshed_filter.push("huc_4 ='" +temp +"'");
+                }else{
+                    //wshed_filter=  "huc_8 ='" +temp +"'"
+                    wshed_filter.push("huc_8 ='" +temp +"'");
+                }
+            });
+            filter.watershed = wshed_filter
+            //<a onclick="addFilter("' + huc + '");" href="javascript:void(0);"> '+ oval +'</a>'
+            cfilter.watershed='<li>Watershed: (Click to Remove)<br><a style="margin-left:1px;" onclick="removeFilter(0);" href="javascript:void(0);">'+ $.trim($('#idwatershed option:selected').text().replace('-','')); + "</a></li>"
+            apply_current();
+            apply_filter();
+        });
+        $('#idaquifer').dblclick(function(){
+            var aquifer_filter=[];
+            $.each($('#idaquifer option:selected'),function (key,item){
+               // var temp = $('#idaquifer option:selected').text().replace(/-/g, '');
+                var temp = $(this).text().replace(/-/g, '');
+                temp = temp.replace(/\s+/g, '');
+                aquifer_filter.push("aquifer ='" + temp + "'");//='';
+                
+            });
+            //aquifer_filter=  "aquifer ='" +temp +"'"
+            filter.aquifer= aquifer_filter
+            //<a onclick="addFilter("' + huc + '");" href="javascript:void(0);"> '+ oval +'</a>'
+            cfilter.aquifer='<li >Aquifer: (Click to Remove)<br><a style="margin-left:1px;"  onclick="removeFilter(1);" href="javascript:void(0);">'+ $.trim($('#idaquifer option:selected').text().replace('-','')); + "</a></li>"
+            apply_current();
+            apply_filter();
+
+        });
         $("#search_filter").click(function(){
             siteLayer.styleMap = myStyles1
             var filt = "Source = '" + $('#select_sites').val() + "'"
@@ -291,7 +366,7 @@ $(document).ready( function() {
                 if($('#mesofilter').val()!=='ALL'){
                     if($('#mesofilter').val()!== undefined){
                         if($('#mesofilter').val()!== null){
-                            filt = filt + " AND SiteType = '" + $('#mesofilter').val() +"'"
+                            filt = filt + " OR SiteType = '" + $('#mesofilter').val() +"'"
                         }
                     }
                 }
@@ -299,7 +374,7 @@ $(document).ready( function() {
                 if($('#idfilter').val()!=='ALL'){
                     if($('#idfilter').val()!== undefined){
                         if($('#idfilter').val()!== null){
-                            filt = filt + " AND SiteType = '" + $('#idfilter').val() +"'"
+                            filt = filt + " OR SiteType = '" + $('#idfilter').val() +"'"
                         }
                     }               
                 }
@@ -313,7 +388,7 @@ $(document).ready( function() {
                             filt = "aquifer ='" +temp +"'";
                         }else{
 
-                            filt=filt + ' AND ' + "aquifer ='" +temp +"'";
+                            filt=filt + ' OR ' + "aquifer ='" +temp +"'";
                         }
                     }
                 }
@@ -332,7 +407,7 @@ $(document).ready( function() {
                             filt = wshed_filter;
                         }else{
 
-                            filt=filt + ' AND ' + wshed_filter;
+                            filt=filt + ' OR ' + wshed_filter;
                         }
                     }
                 }
@@ -371,8 +446,94 @@ $(document).ready( function() {
 	$('.dropdown input, .dropdown label').click(function(e) {
 		e.stopPropagation();
 	});
-console.log('Map.js ready stop')
+//console.log('Map.js ready stop')
 }); //end document ready
+function apply_filter(){
+    var filt="Source = '" + $('#select_sites').val() + "'";
+    var wsaq='';//'',aq='',ty='';
+    if (filter.watershed !==null && filter.aquifer !==null){
+        wsaq=filter.watershed.concat(filter.aquifer);
+        wsaq= ' AND (' + wsaq.join(' OR ') + ')'
+    }else{
+        if (filter.watershed !==null){
+            wsaq = ' AND (' + filter.watershed.join(' OR ') + ')'
+        }
+        if (filter.aquifer !==null){
+            wsaq= ' AND (' + filter.aquifer.join(' OR ') + ')';
+        }
+    }
+    if (filter.type !==null){
+        ty=' AND (' + filter.type.join(' OR ') + ')'
+    }else{ty=''}
+    filt=filt + wsaq + ty 
+    //var aq = filter.
+    //for (var prop in filter){
+     //   if (filter[prop] !==null ){
+            //ddif(filt==''){
+            //dd    filt=filter[prop]
+            //dd}else{
+     //       filt = filt + ' OR ' + filter[prop];
+            
+           //dd }
+     //   }
+    //}
+    //var filt="Source = '" + $('#select_sites').val() + "' AND ( huc_4 ='1106' " + filt.replace("undefined","")  + ")";
+    console.log(filt);
+    //if (filt===''){
+    //    siteLayer.styleMap = siteStyles;
+    //    siteLayer.redraw();
+    //}else{
+       // alert(filt);
+        updateFilter(filt);
+        siteLayer.redraw();
+    //}
+}
+function apply_current(){
+    $('#currentFilt').empty();
+    for (var prop in cfilter){
+        if (cfilter[prop] !==null ){
+            $('#currentFilt').append(cfilter[prop]);
+    }
+    }
+}
+function removeFilter(item){
+    if (item==0){
+        filter.watershed = null;
+        cfilter.watershed=null;
+    }else if (item==1){
+        filter.aquifer = null;
+        cfilter.aquifer=null;
+    }else if (item==2){
+        filter.type = null;
+        cfilter.type=null;
+    }
+    apply_current();
+    apply_filter();
+}
+function type_filter(div){
+    var type_filter=[];//'';
+    var temp='';
+    $.each($('#' + div  + ' option:selected'),function (key,item){
+        temp=item.value.replace(/-/g, '');
+        temp = temp.replace(/\s+/g, '');
+        temp= temp.replace('(','_');
+        temp= temp.replace(')','');
+        type_filter.push("SiteType ='" + temp + "'");
+    });
+    //var temp = $('#' + div  + ' option:selected').val().replace(/-/g, '');
+    //temp = temp.replace(/\s+/g, '');
+    //temp= temp.replace('(','_')
+    //temp= temp.replace(')','')
+    //var type_filter='';
+    //type_filter=  "SiteType ='" +temp +"'"
+    filter.type= type_filter
+    cfilter.type='<li >Type: (Click to Remove)<br><a style="margin-left:1px;"  onclick="removeFilter(2);" href="javascript:void(0);">'+ $.trim($('#' + div + ' option:selected').text()); + "</a></li>"
+    apply_current();
+    apply_filter();
+}
+
+
+
 function load_sites(layer,url,source,mapping){
     loaded_sources.push(source);
         var mess='Loading.... ' + $('#select_sites option:selected').text() 
@@ -394,6 +555,8 @@ function load_sites(layer,url,source,mapping){
                         var pointFeature = new OpenLayers.Feature.Vector(point, null, null);
                         var modtype = val[mapping.SiteType].replace(/-/g, '');//.site_tp_cd.replace(/-/g, '');
                         modtype=modtype.replace(/\s+/g, '');
+                        modtype = modtype.replace('(','_')
+                        modtype = modtype.replace(')','')
                         var aqui='';
                         var huc4='';
                         var huc8='';
@@ -416,11 +579,8 @@ function load_sites(layer,url,source,mapping){
             $.unblockUI();
         }); //end getJSON
 }
-function check_sources(source){
-    
-
-
-
+function addFilter(source){
+    alert(source);
 }
 function display_aquifer(){
    if($('#show_aquifer').attr('checked')?true:false){
