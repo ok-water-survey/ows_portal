@@ -1,388 +1,474 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>OWS - Data Portal</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Oklahoma Water Survey - Data Portal">
-<meta name="author" content="OU CyberCommons">
+    <meta charset="utf-8">
+    <title>OWS - Data Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Oklahoma Water Survey - Data Portal">
+    <meta name="author" content="OU CyberCommons">
 
-		<link rel='stylesheet' id='collapseomatic-css-css'  href='http://oklahomawatersurvey.org/d1/wp-content/plugins/jquery-collapse-o-matic/style.css?ver=1.5.2' type='text/css' media='all' />
-<link rel='stylesheet' id='general-styles-css'  href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/css/style.css?ver=3.4.1' type='text/css' media='all' />
-<!--<link rel='stylesheet' id='social-icons-css'  href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/css/social-icons.css?ver=3.4.1' type='text/css' media='all' />-->
-<link rel='stylesheet' id='superfish-css'  href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/css/superfish.css?ver=3.4.1' type='text/css' media='all' />
-<link rel='stylesheet' id='poshytip-twitter-css'  href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/js/poshytip-1.0/src/tip-twitter/tip-twitter.css?ver=3.4.1' type='text/css' media='all' />
-<link rel='stylesheet' id='poshytip-yellow-css'  href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/js/poshytip-1.0/src/tip-yellowsimple/tip-yellowsimple.css?ver=3.4.1' type='text/css' media='all' />
-<link rel='stylesheet' id='tabs-css'  href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/css/tabs.css?ver=3.4.1' type='text/css' media='all' />
-<link rel='stylesheet' id='nivoCss-css'  href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/css/nivo-slider.css?ver=3.4.1' type='text/css' media='all' />
-<link rel='stylesheet' id='fancyBoxCss-css'  href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/js/jquery.fancybox-1.3.4/fancybox/jquery.fancybox-1.3.4.css?ver=3.4.1' type='text/css' media='all' />
-<link rel='stylesheet' id='bbp-default-bbpress-css'  href='http://oklahomawatersurvey.org/d1/wp-content/plugins/bbpress/bbp-theme-compat/css/bbpress.css?ver=2.1.2' type='text/css' media='screen' />
-<link rel='stylesheet' id='lightboxStyle-css'  href='http://oklahomawatersurvey.org/d1/wp-content/plugins/lightbox-plus/css/dark/colorbox.css?ver=2.0.2' type='text/css' media='screen' />
+    <link rel='stylesheet' id='collapseomatic-css-css'
+          href='http://oklahomawatersurvey.org/d1/wp-content/plugins/jquery-collapse-o-matic/style.css?ver=1.5.2'
+          type='text/css' media='all'/>
+    <link rel='stylesheet' id='general-styles-css'
+          href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/css/style.css?ver=3.4.1' type='text/css'
+          media='all'/>
+    <!--<link rel='stylesheet' id='social-icons-css'  href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/css/social-icons.css?ver=3.4.1' type='text/css' media='all' />-->
+    <link rel='stylesheet' id='superfish-css'
+          href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/css/superfish.css?ver=3.4.1' type='text/css'
+          media='all'/>
+    <link rel='stylesheet' id='poshytip-twitter-css'
+          href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/js/poshytip-1.0/src/tip-twitter/tip-twitter.css?ver=3.4.1'
+          type='text/css' media='all'/>
+    <link rel='stylesheet' id='poshytip-yellow-css'
+          href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/js/poshytip-1.0/src/tip-yellowsimple/tip-yellowsimple.css?ver=3.4.1'
+          type='text/css' media='all'/>
+    <link rel='stylesheet' id='tabs-css'
+          href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/css/tabs.css?ver=3.4.1' type='text/css'
+          media='all'/>
+    <link rel='stylesheet' id='nivoCss-css'
+          href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/css/nivo-slider.css?ver=3.4.1' type='text/css'
+          media='all'/>
+    <link rel='stylesheet' id='fancyBoxCss-css'
+          href='http://oklahomawatersurvey.org/d1/wp-content/themes/nova/js/jquery.fancybox-1.3.4/fancybox/jquery.fancybox-1.3.4.css?ver=3.4.1'
+          type='text/css' media='all'/>
+    <link rel='stylesheet' id='bbp-default-bbpress-css'
+          href='http://oklahomawatersurvey.org/d1/wp-content/plugins/bbpress/bbp-theme-compat/css/bbpress.css?ver=2.1.2'
+          type='text/css' media='screen'/>
+    <link rel='stylesheet' id='lightboxStyle-css'
+          href='http://oklahomawatersurvey.org/d1/wp-content/plugins/lightbox-plus/css/dark/colorbox.css?ver=2.0.2'
+          type='text/css' media='screen'/>
 
-<link rel=stylesheet href="http://test.cybercommons.org/flora/jqui/development-bundle/themes/base/jquery.ui.all.css" type="text/css" media="screen, print">
-<link rel=stylesheet href="http://test.cybercommons.org/flora/bootstrap/css/bootstrap-responsive.min.css" type="text/css" media="screen, print">
-<link rel=stylesheet href="http://test.cybercommons.org/flora/bootstrap/css/bootstrap.min.css" type="text/css" media="screen, print">
-<link rel=stylesheet href="http://static.cybercommons.org/css/bootstrap/css/cybercommons.css" type="text/css" media="screen, print">
+    <link rel=stylesheet href="http://test.cybercommons.org/flora/jqui/development-bundle/themes/base/jquery.ui.all.css"
+          type="text/css" media="screen, print">
+    <link rel=stylesheet href="http://test.cybercommons.org/flora/bootstrap/css/bootstrap-responsive.min.css"
+          type="text/css" media="screen, print">
+    <link rel=stylesheet href="http://test.cybercommons.org/flora/bootstrap/css/bootstrap.min.css" type="text/css"
+          media="screen, print">
+    <link rel=stylesheet href="http://static.cybercommons.org/css/bootstrap/css/cybercommons.css" type="text/css"
+          media="screen, print">
 
-<script type="text/javascript" src="http://static.cybercommons.org/js/jquery-1.7.2.min.js"></script>
-<script type="text/javascript" src="http://static.cybercommons.org/js/jquery-ui-1.8.10.custom.min.js"></script>
-<script type="text/javascript" src="http://static.cybercommons.org/css/bootstrap/js/bootstrap.min.js"></script>
-<!--<script type="text/javascript" src="http://static.cybercommons.org/js/OpenLayers-2.12/OpenLayers.js"></script>-->
-<!--<script type="text/javascript" src="http://test.cybercommons.org/flora/OpenLayers-2.11/OpenLayers.js"></script>-->
-<script type="text/javascript" src="http://static.cybercommons.org/js/OpenLayers-2.11/OpenLayers.js"></script>
-<script type="text/javascript" src="http://static.cybercommons.org/js/flot/jquery.flot.min.js"></script>
-<script type="text/javascript" src="http://static.cybercommons.org/js/flot/jquery.flot.selection.min.js"></script>
-<script type="text/javascript" src="http://test.cybercommons.org/flora/flotlabels/jquery.flot.axislabels.js"></script>
-<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&v=3.6"></script>
-<!--<script src="http://maps.google.com/maps/api/js?v=3.6&amp;sensor=false&key=AIzaSyB1OApFshSYU6P8eUk7BpF6_oPMD9Du8yI"></script>-->
-<script type="text/javascript" src="map.js"></script>
+    <script type="text/javascript" src="http://static.cybercommons.org/js/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="http://static.cybercommons.org/js/jquery-ui-1.8.10.custom.min.js"></script>
+    <script type="text/javascript" src="http://static.cybercommons.org/css/bootstrap/js/bootstrap.min.js"></script>
+    <!--<script type="text/javascript" src="http://static.cybercommons.org/js/OpenLayers-2.12/OpenLayers.js"></script>-->
+    <!--<script type="text/javascript" src="http://test.cybercommons.org/flora/OpenLayers-2.11/OpenLayers.js"></script>-->
+    <script type="text/javascript" src="http://static.cybercommons.org/js/OpenLayers-2.11/OpenLayers.js"></script>
+    <script type="text/javascript" src="http://static.cybercommons.org/js/flot/jquery.flot.min.js"></script>
+    <script type="text/javascript" src="http://static.cybercommons.org/js/flot/jquery.flot.selection.min.js"></script>
+    <script type="text/javascript"
+            src="http://test.cybercommons.org/flora/flotlabels/jquery.flot.axislabels.js"></script>
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false&v=3.6"></script>
+    <!--<script src="http://maps.google.com/maps/api/js?v=3.6&amp;sensor=false&key=AIzaSyB1OApFshSYU6P8eUk7BpF6_oPMD9Du8yI"></script>-->
+    <script type="text/javascript" src="map.js"></script>
 
-<!--<link rel=stylesheet href="style.css" type="text/css" media="screen, print">-->
+    <!--<link rel=stylesheet href="style.css" type="text/css" media="screen, print">-->
 
 </head>
-	<!-- BODY -->
-	<body class="single single-post postid-214 single-format-standard">
+<!-- BODY -->
+<body class="single single-post postid-214 single-format-standard">
 
-			<!-- HEADER -->
-			<div id="header">
-				<!-- wrapper-header -->
-				<div class="wrapper">
-					
-					<!-- Logo -->
-					<a href="http://oklahomawatersurvey.org"><img id="logo" src="http://oklahomawatersurvey.org/d1/wp-content/uploads/2012/08/ows_logo1.png" alt="Oklahoma Water Survey" /></a>					
-					<!-- search -->
-					
-			<div class="top-search">
-				<form  method="get" id="searchform" action="http://oklahomawatersurvey.org">
-					<div>
-						<input type="text" value="Search..." name="s" id="s" onfocus="defaultInput(this,'Search...')" onblur="clearInput(this,'Search...')" />
-						<input type="submit" id="searchsubmit" value=" " />
-					</div>
-				</form>
-			</div>
-							
-					
-				</div>
-				<!-- ENDS wrapper-header -->					
-			</div>
-			<!-- ENDS HEADER -->
-			
-			
-			<!-- Menu -->
-			<div id="menu">
-			
-			
-			
-				<!-- Navigation -->
-				<div id="menu-holder">
-					<div class="wrapper">
-						<!-- Navigation -->
-						<div class="menu-main-menu-container"><ul id="nav" class="sf-menu"><li id="menu-item-6" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="http://oklahomawatersurvey.org/">Home</a></li>
-<li id="menu-item-60" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="http://oklahomawatersurvey.org/?page_id=58">About OWS</a></li>
-<li id="menu-item-175" class="menu-item menu-item-type-taxonomy menu-item-object-category"><a href="http://oklahomawatersurvey.org/?cat=10">Education</a>
-<ul class="sub-menu">
-	<li id="menu-item-293" class="menu-item menu-item-type-taxonomy menu-item-object-category"><a href="http://oklahomawatersurvey.org/?cat=16">K-12</a></li>
-</ul>
-</li>
-<li id="menu-item-174" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent"><a href="http://oklahomawatersurvey.org/?cat=11">Research</a></li>
-<li id="menu-item-173" class="menu-item menu-item-type-taxonomy menu-item-object-category"><a href="http://oklahomawatersurvey.org/?cat=12">Outreach</a></li>
-<li id="menu-item-12" class="menu-item menu-item-type-taxonomy menu-item-object-category"><a href="http://oklahomawatersurvey.org/?cat=6">News</a></li>
-<li id="menu-item-87" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="http://oklahomawatersurvey.org/?page_id=73">Links</a></li>
-<li id="menu-item-284" class="menu-item menu-item-type-post_type menu-item-object-forum"><a href="http://oklahomawatersurvey.org/?forum=oklahoma-water-survey-forums">Discussion</a></li>
-<li id="menu-item-88" class="menu-item menu-item-type-post_type menu-item-object-page"><a href="http://oklahomawatersurvey.org/?page_id=25">Contact</a></li>
-</ul></div>					</div>
-				</div>
+<!-- HEADER -->
+<div id="header">
+    <!-- wrapper-header -->
+    <div class="wrapper">
 
-			</div>
-			<!-- ENDS Menu -->
+        <!-- Logo -->
+        <a href="http://oklahomawatersurvey.org"><img id="logo"
+                                                      src="http://oklahomawatersurvey.org/d1/wp-content/uploads/2012/08/ows_logo1.png"
+                                                      alt="Oklahoma Water Survey"/></a>
+        <!-- search -->
 
-			
-			<!-- MAIN -->
-			<div id="main">
-				<!-- wrapper-main -->
-				<div class="wrapper" style="width:100%">
-					
-					
-					<!-- content -->
-					<br><br>
-					<div id="content" style="width:100%">
-						
-
-
-<!-- cybercommon here --> 
-	<div class="container-fluid">
-		<div class="row-fluid">
-			<div class="span3">
-				<div class="well sidebar-nav">
-					<ul class="nav nav-list">
-						<li class="nav-header"><h4>Data Portal</h4>Search Options</li>
-						<li class="divider"></li>
-					</ul>
-
-					<div class="accordion" id="accordion2">
-						<div class="accordion-group">
-							<div class="accordion-heading">
-								<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#accordState">OWRB Layers </a>
-							</div>
-							<div id="accordState" class="accordion-body collapse">
-								<div class="accordion-inner">
-									<select id="idstate" class="span12" multiple="multiple" size="5">
-										<option value="" selected> = Select =</option>
-									</select> <input id="searchState" class="btn btn-info" type="button" value="Load" />
-								</div>
-							</div>
-						</div>
-						<div class="accordion-group">
-							<div class="accordion-heading">
-								<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#accordText"> Site Name </a>
-							</div>
-							<div id="accordText" class="accordion-body collapse">
-								<div class="accordion-inner">
-									<input id="txtsrch" type="text" class="span12" placeholder=" enter search..."> <input id="searchText" class="btn btn-info" type="button" value="Search" />
-								</div>
-							</div>
-						</div>
-						<div class="accordion-group">
-							<div class="accordion-heading">
-								<a id="advSrchBtn" class="accordion-toggle" href="#">Advanced</a>
-							</div>
-						</div>
-					</div>
-
-					<img src="ows_logo1.png" alt="Floras Explorer" />
-
-				</div>
-				<div class="well alert-success">
-					<div id="totmsg"></div>
-					<div id="msg"></div>
-				</div>
-				
-				<div class="accordion" id="selAccordion"></div>
-
-			</div>
-
-			<div class="span9">
-				<div class="well">
-                	<input type="radio" name="type" value="select" id="noneToggle" onclick="toggleControl(this);" /> Navigate &nbsp;&nbsp;&nbsp;&nbsp; <b>Select by:</b> &nbsp;&nbsp;
-                	<input type="radio" name="type" value="circle" id="circleToggle" onclick="toggleControl(this);" /> Circle &nbsp;&nbsp;
-                	<input type="radio" name="type" value="polygon" id="polygonToggle" onclick="toggleControl(this);" /> Polygon &nbsp;&nbsp;
-               		<input type="radio" name="type" value="box" id="boxToggle" onclick="toggleControl(this);" /> Box
-					<div id="map" class="smallmap" style="width: 100%; height: 700px;"></div>
-				</div>
-			</div>
-		</div>
-
-
-
-	</div>
-	<div id="selinfo">
-		<div id="seldivname">Name: <input id="selname" type="text" value="" /> <span id="srchmsg"></span></div>
-		<table id="sites" class="table table-striped table-bordered table-condensed">
-			<thead>
-				<tr class="ui-widget-header">
-					<th>Site No</th>
-					<th>Sitename</th>
-					<th style="text-align:center;">Status</th>
-					<th style="text-align:right;">Organization</th>
-					<th style="text-align:right;">Type</th>
-				</tr>
-			</thead>
-			<tbody></tbody>
-		</table>
-	</div>
-
-	<div id="advSearch">
-          <div class="accordion" id="accordion2">
-            <div class="accordion-group">
-              <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#siteDesc" style="color:#08C;">Site Description</a>
-              </div>
-              <div id="siteDesc" class="accordion-body collapse in">
-                <div class="accordion-inner">
-                
-					<div class="row">
-						<div class="span2">Site name</div>
-						<div class="span6"><input id="Sitename" type="text" ></div>
-					</div>
-					
-					<br>
-					
-					<br>
-					
-					<br>
-					
+        <div class="top-search">
+            <form method="get" id="searchform" action="http://oklahomawatersurvey.org">
+                <div>
+                    <input type="text" value="Search..." name="s" id="s" onfocus="defaultInput(this,'Search...')"
+                           onblur="clearInput(this,'Search...')"/>
+                    <input type="submit" id="searchsubmit" value=" "/>
                 </div>
-              </div>
-            </div>
-            <div class="accordion-group">
-              <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#Geographic" style="color:#08C;">Geographic Information</a>
-              </div>
-              <div id="Geographic" class="accordion-body collapse">
-                <div class="accordion-inner">
-                    <div class="span2">Geographic Information</div>
-                
-                </div>
-              </div>
-            </div>
-            <div class="accordion-group">
-              <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#Bibliographic" style="color:#08C;">Bibliographic Information</a>
-              </div>
-              <div id="Bibliographic" class="accordion-body collapse">
-                <div class="accordion-inner">
-                
-        		<div class="span2">Publication</div>
-				
-                </div>
-              </div>
-            </div>
-          </div>
-	</div>
-	<!-- cybercommon end-->
-						<!-- Posts -->
-						<div id="posts" class="single">
-							
+            </form>
+        </div>
 
 
-<!-- post -->
-<div class="post">
-
-	
-						
-
-	
+    </div>
+    <!-- ENDS wrapper-header -->
 </div>
-<!-- ENDS post -->
+<!-- ENDS HEADER -->
 
 
+<!-- Menu -->
+<div id="menu">
 
 
+    <!-- Navigation -->
+    <div id="menu-holder">
+        <div class="wrapper">
+            <!-- Navigation -->
+            <div class="menu-main-menu-container">
+                <ul id="nav" class="sf-menu">
+                    <li id="menu-item-6" class="menu-item menu-item-type-post_type menu-item-object-page"><a
+                        href="http://oklahomawatersurvey.org/">Home</a></li>
+                    <li id="menu-item-60" class="menu-item menu-item-type-post_type menu-item-object-page"><a
+                        href="http://oklahomawatersurvey.org/?page_id=58">About OWS</a></li>
+                    <li id="menu-item-175" class="menu-item menu-item-type-taxonomy menu-item-object-category"><a
+                        href="http://oklahomawatersurvey.org/?cat=10">Education</a>
+                        <ul class="sub-menu">
+                            <li id="menu-item-293" class="menu-item menu-item-type-taxonomy menu-item-object-category">
+                                <a href="http://oklahomawatersurvey.org/?cat=16">K-12</a></li>
+                        </ul>
+                    </li>
+                    <li id="menu-item-174"
+                        class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent">
+                        <a href="http://oklahomawatersurvey.org/?cat=11">Research</a></li>
+                    <li id="menu-item-173" class="menu-item menu-item-type-taxonomy menu-item-object-category"><a
+                        href="http://oklahomawatersurvey.org/?cat=12">Outreach</a></li>
+                    <li id="menu-item-12" class="menu-item menu-item-type-taxonomy menu-item-object-category"><a
+                        href="http://oklahomawatersurvey.org/?cat=6">News</a></li>
+                    <li id="menu-item-87" class="menu-item menu-item-type-post_type menu-item-object-page"><a
+                        href="http://oklahomawatersurvey.org/?page_id=73">Links</a></li>
+                    <li id="menu-item-284" class="menu-item menu-item-type-post_type menu-item-object-forum"><a
+                        href="http://oklahomawatersurvey.org/?forum=oklahoma-water-survey-forums">Discussion</a></li>
+                    <li id="menu-item-88" class="menu-item menu-item-type-post_type menu-item-object-page"><a
+                        href="http://oklahomawatersurvey.org/?page_id=25">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
-<!-- Comments form -->
-
-<!-- Respond -->				
-
-<div class="clear"></div>
-<!-- ENDS Respond -->
+</div>
+<!-- ENDS Menu -->
 
 
+<!-- MAIN -->
+<div id="main">
+    <!-- wrapper-main -->
+    <div class="wrapper" style="width:100%">
 
 
+        <!-- content -->
+        <br><br>
+
+        <div id="content" style="width:100%">
 
 
+            <!-- cybercommon here -->
+            <div class="container-fluid">
+                <div class="row-fluid">
+                    <div class="span3">
+                        <div class="well sidebar-nav">
+                            <ul class="nav nav-list">
+                                <li class="nav-header"><h4>Data Portal</h4>Search Options</li>
+                                <li class="divider"></li>
+                            </ul>
+
+                            <div class="accordion" id="accordion2">
+                                <div class="accordion-group">
+                                    <div class="accordion-heading">
+                                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2"
+                                           href="#accordState">OWRB Layers </a>
+                                    </div>
+                                    <div id="accordState" class="accordion-body collapse">
+                                        <div class="accordion-inner">
+                                            <select id="idstate" class="span12" multiple="multiple" size="5">
+                                                <option value="" selected> = Select =</option>
+                                            </select> <input id="searchState" class="btn btn-info" type="button"
+                                                             value="Load"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-group">
+                                    <div class="accordion-heading">
+                                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2"
+                                           href="#accordText"> Site Name </a>
+                                    </div>
+                                    <div id="accordText" class="accordion-body collapse">
+                                        <div class="accordion-inner">
+                                            <input id="txtsrch" type="text" class="span12"
+                                                   placeholder=" enter search..."> <input id="searchText"
+                                                                                          class="btn btn-info"
+                                                                                          type="button" value="Search"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-group">
+                                    <div class="accordion-heading">
+                                        <a id="advSrchBtn" class="accordion-toggle" href="#">Advanced</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <img src="ows_logo1.png" alt="Floras Explorer"/>
+
+                        </div>
+                        <div class="well alert-success">
+                            <div id="totmsg"></div>
+                            <div id="msg"></div>
+                        </div>
+
+                        <div class="accordion" id="selAccordion"></div>
+
+                    </div>
+
+                    <div class="span9">
+                        <div class="well">
+                            <input type="radio" name="type" value="select" id="noneToggle"
+                                   onclick="toggleControl(this);"/> Navigate &nbsp;&nbsp;&nbsp;&nbsp; <b>Select by:</b>
+                            &nbsp;&nbsp;
+                            <input type="radio" name="type" value="circle" id="circleToggle"
+                                   onclick="toggleControl(this);"/> Circle &nbsp;&nbsp;
+                            <input type="radio" name="type" value="polygon" id="polygonToggle"
+                                   onclick="toggleControl(this);"/> Polygon &nbsp;&nbsp;
+                            <input type="radio" name="type" value="box" id="boxToggle" onclick="toggleControl(this);"/>
+                            Box
+                            <div id="map" class="smallmap" style="width: 100%; height: 700px;"></div>
+                        </div>
+                    </div>
+                </div>
 
 
-						</div>
-						<!-- ENDS Posts -->	
-						
-						
+            </div>
+            <div id="selinfo">
+                <div id="seldivname">Name: <input id="selname" type="text" value=""/> <span id="srchmsg"></span></div>
+                <table id="sites" class="table table-striped table-bordered table-condensed">
+                    <thead>
+                    <tr class="ui-widget-header">
+                        <th>Site No</th>
+                        <th>Sitename</th>
+                        <th style="text-align:center;">Status</th>
+                        <th style="text-align:right;">Organization</th>
+                        <th style="text-align:right;">Type</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
 
-						
-						
-						<!-- pager -->	
-						<div class="clear"></div>
-						<br class="clear"></br>					
-						
-		
-					</div>
-					<!-- ENDS content -->
+            <div id="advSearch">
+                <div class="accordion" id="accordion2">
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2"
+                               href="#siteDesc" style="color:#08C;">Site Description</a>
+                        </div>
+                        <div id="siteDesc" class="accordion-body collapse in">
+                            <div class="accordion-inner">
 
-				</div>
-				<!-- ENDS wrapper-main -->
-			</div>
-			<!-- ENDS MAIN -->
+                                <div class="row">
+                                    <div class="span2">Site name</div>
+                                    <div class="span6"><input id="Sitename" type="text"></div>
+                                </div>
 
-			
+                                <br>
+
+                                <br>
+
+                                <br>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2"
+                               href="#Geographic" style="color:#08C;">Geographic Information</a>
+                        </div>
+                        <div id="Geographic" class="accordion-body collapse">
+                            <div class="accordion-inner">
+                                <div class="span2">Geographic Information</div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2"
+                               href="#Bibliographic" style="color:#08C;">Bibliographic Information</a>
+                        </div>
+                        <div id="Bibliographic" class="accordion-body collapse">
+                            <div class="accordion-inner">
+
+                                <div class="span2">Publication</div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- cybercommon end-->
+            <!-- Posts -->
+            <div id="posts" class="single">
 
 
-			
-			<!-- FOOTER -->
+                <!-- post -->
+                <div class="post">
 
-			<div id="footer">
-				<!-- wrapper-footer -->
-				<div class="wrapper">
-					<!-- footer-cols -->
-					<ul id="footer-cols">
-						<li class="col"><h6>Discussion Forum Sign In</h6>
-			<form method="post" action="http://oklahomawatersurvey.org/d1/wp-login.php" class="bbp-login-form">
-				<fieldset>
-					<legend>Log In</legend>
 
-					<div class="bbp-username">
-						<label for="user_login">Username: </label>
-						<input type="text" name="log" value="" size="20" id="user_login" tabindex="101" />
-					</div>
+                </div>
+                <!-- ENDS post -->
 
-					<div class="bbp-password">
-						<label for="user_pass">Password: </label>
-						<input type="password" name="pwd" value="" size="20" id="user_pass" tabindex="102" />
-					</div>
 
-					<div class="bbp-remember-me">
-						<input type="checkbox" name="rememberme" value="forever"  id="rememberme" tabindex="103" />
-						<label for="rememberme">Remember Me</label>
-					</div>
+                <!-- Comments form -->
 
-					<div class="bbp-submit-wrapper">
+                <!-- Respond -->
 
-						
-						<button type="submit" name="user-submit" id="user-submit" tabindex="104" class="button submit user-submit">Log In</button>
+                <div class="clear"></div>
+                <!-- ENDS Respond -->
 
-						
-		<input type="hidden" name="user-cookie" value="1" />
 
-		<input type="hidden" id="bbp_redirect_to" name="redirect_to" value="http://oklahomawatersurvey.org/" /><input type="hidden" id="_wpnonce" name="_wpnonce" value="ccfc59b5fe" /><input type="hidden" name="_wp_http_referer" value="/?p=214" />
-					</div>
+            </div>
+            <!-- ENDS Posts -->
 
-					
-						<div class="bbp-login-links">
 
-							
-								<a href="http://oklahomawatersurvey.org/d1/wp-login.php?action=register" title="Register" class="bbp-register-link">Register</a>
+            <!-- pager -->
+            <div class="clear"></div>
+            <br class="clear"></br>
 
-							
-							
-						</div>
 
-					
-				</fieldset>
-			</form>
+        </div>
+        <!-- ENDS content -->
 
-		</li>		<li class="col">		
-		</li><li class="col"><h6>Oklahoma Survey Department</h6>			<div class="textwidget"><a target="_blank" href="http://www.ou.edu/cas/archsur"><img src="http://oklahomawatersurvey.org/d1/images/icons/oas.png"  border="0" width="25px" style="position:absolute; margin-top: 5px;  margin-left: 0px; " /> <div   style="position:absolute; margin-left: 30px; margin-top: 8px; font-size: 13px; color: #d4d4d4">Oklahoma Archeological Survey</div></a>
-<br>
-<a target="_blank" href="http://www.biosurvey.ou.edu"><img src="http://oklahomawatersurvey.org/d1/images/icons/obs.png" border="0" width="25px" style="position:absolute; margin-top: 10px;  margin-left: 0px; " /> <div   style="position:absolute; margin-left: 30px; margin-top: 13px; font-size: 13px; color: #d4d4d4">Oklahoma Biological Survey</div></a>
-<br>
-<a target="_blank" href="http://climate.ok.gov"><img src="http://oklahomawatersurvey.org/d1/images/icons/ocs.png" border="0" width="25px" style="position:absolute; margin-top: 15px;  margin-left: 0px; " /> <div   style="position:absolute; margin-left: 30px; margin-top: 18px; font-size: 13px; color: #d4d4d4">Oklahoma Climatological Survey</div></a>
-<br>
-<a target="_blank" href="http://www.ogs.ou.edu/homepage.php"><img src="http://oklahomawatersurvey.org/d1/images/icons/ogs.png" border="0" width="25px" style="position:absolute; margin-top: 20px; margin-left: 0px; " /> <div style="position:absolute; margin-left: 30px; margin-top: 23px; font-size: 13px; color: #d4d4d4">Oklahoma Geological Survey</div></a></div>
-		</li>					</ul>
-					<!-- ENDS footer-cols -->
-				</div>
-				<!-- ENDS wrapper-footer -->
-			</div>
-			<!-- ENDS FOOTER -->
-		
-		
-			<!-- Bottom -->
-			<div id="bottom">
-				<!-- wrapper-bottom -->
-				<div class="wrapper">
-					<div id="bottom-text"><table border="0" width="100%" cellpadding="0" cellspacing="0">
-	<tr>
-		<td>2012 Oklahoma Water Survey All Rights Reserved</td>
-		<td><div align="right" style="margin-right:55px"><a target="_blank" title="University of Oklahoma" href="http://www.ou.edu"><img border="0" src="http://oklahomawatersurvey.org/d1/wp-content/uploads/ou_s.png"></a></div></td>
-	</tr>
-</table></div>
-									
-					<!-- Social -->
-					
-					<!--<div id="to-top" class="poshytip" title="To top"></div>-->
-				</div>
-				<!-- ENDS wrapper-bottom -->
-			</div>
-			<!-- ENDS Bottom -->
-			
+    </div>
+    <!-- ENDS wrapper-main -->
+</div>
+<!-- ENDS MAIN -->
 
-	</body>
+
+<!-- FOOTER -->
+
+<div id="footer">
+    <!-- wrapper-footer -->
+    <div class="wrapper">
+        <!-- footer-cols -->
+        <ul id="footer-cols">
+            <li class="col"><h6>Discussion Forum Sign In</h6>
+
+                <form method="post" action="http://oklahomawatersurvey.org/d1/wp-login.php" class="bbp-login-form">
+                    <fieldset>
+                        <legend>Log In</legend>
+
+                        <div class="bbp-username">
+                            <label for="user_login">Username: </label>
+                            <input type="text" name="log" value="" size="20" id="user_login" tabindex="101"/>
+                        </div>
+
+                        <div class="bbp-password">
+                            <label for="user_pass">Password: </label>
+                            <input type="password" name="pwd" value="" size="20" id="user_pass" tabindex="102"/>
+                        </div>
+
+                        <div class="bbp-remember-me">
+                            <input type="checkbox" name="rememberme" value="forever" id="rememberme" tabindex="103"/>
+                            <label for="rememberme">Remember Me</label>
+                        </div>
+
+                        <div class="bbp-submit-wrapper">
+
+
+                            <button type="submit" name="user-submit" id="user-submit" tabindex="104"
+                                    class="button submit user-submit">Log In
+                            </button>
+
+
+                            <input type="hidden" name="user-cookie" value="1"/>
+
+                            <input type="hidden" id="bbp_redirect_to" name="redirect_to"
+                                   value="http://oklahomawatersurvey.org/"/><input type="hidden" id="_wpnonce"
+                                                                                   name="_wpnonce"
+                                                                                   value="ccfc59b5fe"/><input
+                            type="hidden" name="_wp_http_referer" value="/?p=214"/>
+                        </div>
+
+
+                        <div class="bbp-login-links">
+
+
+                            <a href="http://oklahomawatersurvey.org/d1/wp-login.php?action=register" title="Register"
+                               class="bbp-register-link">Register</a>
+
+
+                        </div>
+
+
+                    </fieldset>
+                </form>
+
+            </li>
+            <li class="col">
+            </li>
+            <li class="col"><h6>Oklahoma Survey Department</h6>
+
+                <div class="textwidget"><a target="_blank" href="http://www.ou.edu/cas/archsur"><img
+                    src="http://oklahomawatersurvey.org/d1/images/icons/oas.png" border="0" width="25px"
+                    style="position:absolute; margin-top: 5px;  margin-left: 0px; "/>
+
+                    <div style="position:absolute; margin-left: 30px; margin-top: 8px; font-size: 13px; color: #d4d4d4">
+                        Oklahoma Archeological Survey
+                    </div>
+                </a>
+                    <br>
+                    <a target="_blank" href="http://www.biosurvey.ou.edu"><img
+                        src="http://oklahomawatersurvey.org/d1/images/icons/obs.png" border="0" width="25px"
+                        style="position:absolute; margin-top: 10px;  margin-left: 0px; "/>
+
+                        <div
+                            style="position:absolute; margin-left: 30px; margin-top: 13px; font-size: 13px; color: #d4d4d4">
+                            Oklahoma Biological Survey
+                        </div>
+                    </a>
+                    <br>
+                    <a target="_blank" href="http://climate.ok.gov"><img
+                        src="http://oklahomawatersurvey.org/d1/images/icons/ocs.png" border="0" width="25px"
+                        style="position:absolute; margin-top: 15px;  margin-left: 0px; "/>
+
+                        <div
+                            style="position:absolute; margin-left: 30px; margin-top: 18px; font-size: 13px; color: #d4d4d4">
+                            Oklahoma Climatological Survey
+                        </div>
+                    </a>
+                    <br>
+                    <a target="_blank" href="http://www.ogs.ou.edu/homepage.php"><img
+                        src="http://oklahomawatersurvey.org/d1/images/icons/ogs.png" border="0" width="25px"
+                        style="position:absolute; margin-top: 20px; margin-left: 0px; "/>
+
+                        <div
+                            style="position:absolute; margin-left: 30px; margin-top: 23px; font-size: 13px; color: #d4d4d4">
+                            Oklahoma Geological Survey
+                        </div>
+                    </a></div>
+            </li>
+        </ul>
+        <!-- ENDS footer-cols -->
+    </div>
+    <!-- ENDS wrapper-footer -->
+</div>
+<!-- ENDS FOOTER -->
+
+
+<!-- Bottom -->
+<div id="bottom">
+    <!-- wrapper-bottom -->
+    <div class="wrapper">
+        <div id="bottom-text">
+            <table border="0" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td>2012 Oklahoma Water Survey All Rights Reserved</td>
+                    <td>
+                        <div align="right" style="margin-right:55px"><a target="_blank" title="University of Oklahoma"
+                                                                        href="http://www.ou.edu"><img border="0"
+                                                                                                      src="http://oklahomawatersurvey.org/d1/wp-content/uploads/ou_s.png"></a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Social -->
+
+        <!--<div id="to-top" class="poshytip" title="To top"></div>-->
+    </div>
+    <!-- ENDS wrapper-bottom -->
+</div>
+<!-- ENDS Bottom -->
+
+
+</body>
