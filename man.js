@@ -1,157 +1,1 @@
-﻿var MVC = {
-    Models: {},
-    Collections: {},
-    Views: {},
-    Templates:{}
-}
-//****** Template Manager *************
-
-var TemplateManager = {
-  templates: {},
-  get: function(id){ 
-    var result
-    var template = this.templates[id];
-    if (template) {
-        result = template;
-    } else {
-      var that = this;
-      $.ajax({
-            type:'GET',async:false,
-            url:"/catalog/db_find/ows-portal/data/{'spec':{'id':'" + id + "'}}/",
-            success:function(template){
-                var $tmpl = _.template(template[0].template);
-                that.templates[id] = $tmpl;
-                result=$tmpl;
-            }
-        });
-    }
-    return result 
-  }
-}
-//****** Models ***********************
-
-MVC.Models.Watershed = Backbone.Model.extend({})
-MVC.Models.Aquifer = Backbone.Model.extend({})
-
-//****** Collections ******************
-
-MVC.Collections.Watersheds = Backbone.Collection.extend({
-    model: MVC.Models.Watershed,
-    url: "/catalog/db_find/ows-portal/data/{'spec':{'model':'Watershed'},'sort':[('order',1)]}/",
-});
-MVC.Collections.Aquifers = Backbone.Collection.extend({
-    model: MVC.Models.Aquifer,
-    url: "/catalog/db_find/ows-portal/data/{'spec':{'model':'Watershed'},'sort':[('order',1)]}/",
-});
-//****** Views ************************
-
-MVC.Views.Watersheds = Backbone.View.extend({
-    el: $("#watershd"),
-    template: "Watershed_base", 
-    initialize: function () {
-        //Initialize Backbone js temple
-        this.template=TemplateManager.get(this.template);
-        //render
-        this.render();
-        //_.bindAll(this, "render", "addOne", "addAll");
-        this.collection.bind("reset", this.render, this);
-        this.collection.bind("add", this.addOne, this);
-    },
-    render: function () {
-        $(this.el).html(this.template())//TemplateManager.get(this.template)())
-        //this.addAll();
-    },
-    addAll: function () {
-        this.collection.each(this.addOne);
-    },
-    addOne: function (model) {
-        view = new MVC.Views.Watershed({ model: model });
-        $("ul", this.el).append(view.render());
-    }
-})
-MVC.Views.Watershed = Backbone.View.extend({
-    tagName: "li",
-    template:"Watershed_detail",
-    undolist: $("#currentFilt_wshd"),
-    undoitem:'<li id="my_id_li"><img src="close_small_icon.gif" alt="Remove"><a style="display:inline-block">my_name</a></li>',
-    initialize: function () {
-        //Initialize Backbone js temple
-        this.template=TemplateManager.get(this.template)
-        //_.bindAll(this, 'render', 'test');
-        this.model.bind('destroy', this.destroyItem, this);
-        this.model.bind('remove', this.removeItem, this);
-    },
-    render: function () {
-        //Render template inside our view
-        var $addFilterdata = this.model.toJSON(); //data
-        //Set watershed name
-        var $filt;
-        if($addFilterdata.huc_id.length==8){
-            $filt="huc_8 = '" + $addFilterdata.huc_id + "'";
-            $addFilterdata.name = '&nbsp;&nbsp; - ' + $addFilterdata.name;
-        }else{
-            $addFilterdata.name = '&nbsp;' + $addFilterdata.name;
-            $filt="huc_4 = '" + $addFilterdata.huc_id + "'";
-        }
-        //render
-        $(this.el).append(this.template($addFilterdata)) ;
-        //Add events
-        var $addFilterAction = this.$('.add_filter');
-        this.undoitem = this.undoitem.replace(/my_id/g, $addFilterdata.huc_id);
-        this.undoitem = this.undoitem.replace(/my_name/g, $addFilterdata.name);
-        var $undolist = this.undolist
-        $undolist.append(this.undoitem);
-        var $undoitm = $('#' + $addFilterdata.huc_id + '_li').hide();
-
-        $addFilterAction.click(function(){
-            console.log($addFilterdata.huc_id);
-            if(filter.watershed ==null){filter.watershed=[];}
-            filter.watershed.push($filt);
-            filter.watershed = _.uniq(filter.watershed,JSON.stringify);
-            apply_filter();
-            //Show close li on
-            $undolist.show()
-            $undoitm.show();
-
-        });
-        $undoitm.click(function(){
-            if ($('#currentFilt_wshd > li:visible').length==1){
-                console.log(filter.watershed);
-                filter.watershed = null;
-                console.log(filter.watershed);
-                $undolist.hide()
-            }else{
-                var index = filter.watershed.indexOf($filt);
-                filter.watershed.splice(index, 1);
-            };
-            $undoitm.hide();
-            apply_filter();
-        });
-        return $(this.el) //$(this.el).append(this.template(this.model.toJSON())) ;
-    },
-    removeItem: function (model) {
-        console.log("Remove - " + model.get("Name"))
-        this.remove();
-    }
-})
-
-//****** Router ***********************
-
-MVC.Router = Backbone.Router.extend({
-    routes: {
-        "": "defaultRoute"  //http://localhost:22257/Theater/theater.htm
-    },
-    defaultRoute: function () {
-        //console.log("defaultRoute");
-        //new MVC.Collections.Templates()
-        MVC.watersheds = new MVC.Collections.Watersheds()
-        new MVC.Views.Watersheds({ collection: MVC.watersheds }); //Add this line
-        MVC.watersheds.fetch();
-        //console.log(MVC.watersheds.length)
-    }
-})
-
-//****** Main App start ****************
-
-var appRouter = new MVC.Router();
-Backbone.history.start();
+﻿var MVC = {    Models: {},    Collections: {},    Views: {},    Templates: {}}//****** Template Manager *************var TemplateManager = {    templates: {},    get: function (id) {        var result;        var template = this.templates[id];        if (template) {            result = template;        } else {            var that = this;            $.ajax({                type: 'GET', async: false,                url: "/catalog/db_find/ows-portal/data/{'spec':{'id':'" + id + "'}}/",                success: function (template) {                    var $tmpl = _.template(template[0].template);                    that.templates[id] = $tmpl;                    result = $tmpl;                }            });        }        return result    }}//****** GEO-JSON Manager *************var GeojsonManager = {    templates: {},    get: function (id, type) {        var result;        var template = this.templates[id];        if (template) {            result = template;        } else {            var that = this;            var qry, apptype;            if (type == 'aquifer') {                qry = "/mongo/db_find/ows/aquifers/{'spec':{'properties.NAME':'" + id + "'}}";                styletype = 'aquifer'            } else {                qry = '/mongo/db_find/ows/watersheds/{"spec":{"properties.HUC":"' + id + '"}}'                styletype = 'watershed'            }            $.ajax({                type: 'GET', async: false,                url: qry,                success: function (template) {                    that.templates[id] = template;                    $.each(template, function (idx, val) {                        val.properties.STYLE_TYPE = styletype;                    });                    result = template;                }            });        }        return result    }}//****** Models ***********************MVC.Models.Watershed = Backbone.Model.extend({})MVC.Models.Aquifer = Backbone.Model.extend({})//****** Collections ******************MVC.Collections.Watersheds = Backbone.Collection.extend({    model: MVC.Models.Watershed,    url: "/catalog/db_find/ows-portal/data/{'spec':{'model':'Watershed'},'sort':[('order',1)]}/"});MVC.Collections.Aquifers = Backbone.Collection.extend({    model: MVC.Models.Aquifer,    url: "/catalog/db_find/ows-portal/data/{'spec':{'model':'Aquifer'},'sort':[('type',-1),('class',1),('name',1)]}/"});//****** Views ************************//BASE ViewsMVC.Views.Watersheds = Backbone.View.extend({    el: $("#watershd"),    template: "Watershed_base",    initialize: function () {        //Initialize Backbone js temple        this.template = TemplateManager.get(this.template);        //render        this.render();        //_.bindAll(this, "render", "addOne", "addAll");        this.collection.bind("reset", this.render, this);        this.collection.bind("add", this.addOne, this);    },    render: function () {        $(this.el).html(this.template())//TemplateManager.get(this.template)())        //this.addAll();    },    addAll: function () {        this.collection.each(this.addOne);    },    addOne: function (model) {        view = new MVC.Views.Watershed({ model: model });        $("ul", this.el).append(view.render());    }})MVC.Views.Aquifers = Backbone.View.extend({    el: $("#aquifers"),    template: "Aquifer_base",    initialize: function () {        //Initialize Backbone js temple        this.template = TemplateManager.get(this.template);        //render        this.render();        //_.bindAll(this, "render", "addOne", "addAll");        this.collection.bind("reset", this.render, this);        this.collection.bind("add", this.addOne, this);    },    render: function () {        $(this.el).html(this.template())//TemplateManager.get(this.template)())        //this.addAll();    },    addAll: function () {        this.collection.each(this.addOne);    },    addOne: function (model) {        view = new MVC.Views.Aquifer({ model: model });        result = view.render();        $(result.position, this.el).append(result.template);    }})//Detail ViewsMVC.Views.Watershed = Backbone.View.extend({    tagName: "li",    template: "Watershed_detail",    undolist: $("#currentFilt_wshd"),    undoitem: '<li id="my_id_li"><img src="x.png" alt="Remove"><a style="display:inline-block">my_name</a></li>',    initialize: function () {        //Initialize Backbone js temple        this.template = TemplateManager.get(this.template)        //_.bindAll(this, 'render', 'test');        this.model.bind('destroy', this.destroyItem, this);        this.model.bind('remove', this.removeItem, this);    },    render: function () {        console.log('render')        //Render template inside our view        var $addFilterdata = this.model.toJSON(); //data        //Set watershed name        var $filt;        if ($addFilterdata.huc_id.length == 8) {            $filt = "huc_8 = '" + $addFilterdata.huc_id + "'";            $addFilterdata.name = '&nbsp;&nbsp; - ' + $addFilterdata.name;        } else {            $addFilterdata.name = '&nbsp;' + $addFilterdata.name;            $filt = "huc_4 = '" + $addFilterdata.huc_id + "'";        }        //render        $(this.el).append(this.template($addFilterdata));        //Add events        var $addFilterAction = this.$('.add_filter');        this.undoitem = this.undoitem.replace(/my_id/g, $addFilterdata.huc_id);        this.undoitem = this.undoitem.replace(/my_name/g, $addFilterdata.name);        var $undolist = this.undolist        $undolist.append(this.undoitem);        var $undoitm = $('#' + $addFilterdata.huc_id + '_li').hide();        var $visible = false;        //geojson        var $showFilter = $('.show_fltr');        var $fdata = null        $showFilter.click(function () {            if ($visible) {                if ($fdata == null) {                    $fdata = GeojsonManager.get($addFilterdata.huc_id, 'Watershed');                }                showFeature($fdata, $showFilter);            }        });        $addFilterAction.click(function () {            console.log($addFilterdata.huc_id);            if (filter.watershed == null) {                filter.watershed = [];            }            filter.watershed.push($filt);            filter.watershed = _.uniq(filter.watershed, JSON.stringify);            apply_filter();            //Show close li on            $undolist.show();            $undoitm.show();            $visible = true;            //resetFeatures($showFilter)            if ($fdata == null) {                $fdata = GeojsonManager.get($addFilterdata.huc_id, 'Watershed');            }            showFeature($fdata, $showFilter);        });        $undoitm.mouseover(function () {            selectFeature.select(filterLayer.getFeaturesByAttribute('HUC', $addFilterdata.huc_id)[0])        });        $undoitm.mouseout(function () {            selectFeature.unselect(filterLayer.getFeaturesByAttribute('HUC', $addFilterdata.huc_id)[0])        });        $undoitm.click(function () {            if ($('#currentFilt_wshd > li:visible').length == 1) {                console.log(filter.watershed);                filter.watershed = null;                console.log(filter.watershed);                $undolist.hide()            } else {                var index = filter.watershed.indexOf($filt);                filter.watershed.splice(index, 1);            }            ;            $undoitm.hide();            apply_filter();            $visible = false;            removeFeature('HUC', $addFilterdata.huc_id)            //resetFeatures($showFilter)            //if($fdata!=null){            //    showFeature($fdata,$showFilter);            //}        });        return $(this.el) //$(this.el).append(this.template(this.model.toJSON())) ;    },    removeItem: function (model) {        console.log("Remove - " + model.get("Name"))        this.remove();    }})MVC.Views.Aquifer = Backbone.View.extend({    tagName: "li",    template: "Aquifer_detail",    undolist: $("#currentFilt_aquifer"),    undoitem: '<li id="my_id_li"><img src="x.png" alt="Remove"><a style="display:inline-block">my_name</a></li>',    initialize: function () {        //Initialize Backbone js temple        this.template = TemplateManager.get(this.template)        //_.bindAll(this, 'render', 'test');        this.model.bind('destroy', this.destroyItem, this);        this.model.bind('remove', this.removeItem, this);    },    render: function () {        //Render template inside our view        var $addFilterdata = this.model.toJSON(); //data        $addFilterdata.org_name = $addFilterdata.name        //Set aquifer filter        var $filt;        $filt = "aquifer = '" + $addFilterdata.name.replace(/-/g, '').replace(/\s+/g, '') + "'";        //set ul class        var $ul;        if ($addFilterdata.type == "Bedrock") {            $ul = '.b'        } else {            $ul = '.a'        }        ;        if ($addFilterdata.class == "Minor") {            $ul = $ul + 'minor'        } else {            $ul = $ul + 'major'        }        ;        $addFilterdata.name = '&nbsp;' + $addFilterdata.name;        //render        $(this.el).append(this.template($addFilterdata));        //Add events        var $addFilterAction = this.$('.add_filter');        this.undoitem = this.undoitem.replace(/my_id/g, $addFilterdata.order.toString());        this.undoitem = this.undoitem.replace(/my_name/g, $addFilterdata.name);        var $undolist = this.undolist        $undolist.append(this.undoitem);        var $undoitm = $('#' + $addFilterdata.order.toString() + '_li').hide();        var $visible = false;        var $showFilter = $('.show_fltr');        var $fdata = null;        $showFilter.click(function () {            if ($visible) {                if ($fdata == null) {                    $fdata = GeojsonManager.get($addFilterdata.org_name, 'aquifer');                }                showFeature($fdata, $showFilter);            }        });        $addFilterAction.click(function () {            console.log($addFilterdata.name);            if (filter.aquifer == null) {                filter.aquifer = [];            }            filter.aquifer.push($filt);            filter.aquifer = _.uniq(filter.aquifer, JSON.stringify);            apply_filter();            //Show close li on            $undolist.show();            $undoitm.show();            $visible = true;            if ($fdata == null) {                $fdata = GeojsonManager.get($addFilterdata.org_name, 'aquifer');            }            showFeature($fdata, $showFilter);        });        $undoitm.mouseover(function () {            $.each(filterLayer.getFeaturesByAttribute('NAME', $addFilterdata.org_name), function (idx, val) {                selectFeature.select(val);            });            //selectFeature.select(filterLayer.getFeaturesByAttribute('NAME',$addFilterdata.org_name )[0])        });        $undoitm.mouseout(function () {            $.each(filterLayer.getFeaturesByAttribute('NAME', $addFilterdata.org_name), function (idx, val) {                selectFeature.unselect(val);            });            //selectFeature.unselect(filterLayer.getFeaturesByAttribute('NAME',$addFilterdata.org_name )[0])        });        $undoitm.click(function () {            if ($('#currentFilt_aquifer > li:visible').length == 1) {                filter.aquifer = null;                $undolist.hide()            } else {                var index = filter.aquifer.indexOf($filt);                filter.aquifer.splice(index, 1);            }            ;            $undoitm.hide();            apply_filter();            $visible = false;            removeFeature('NAME', $addFilterdata.org_name)        });        return {position: $ul, template: $(this.el)} //$(this.el).append(this.template(this.model.toJSON())) ;    },    removeItem: function (model) {        console.log("Remove - " + model.get("Name"))        this.remove();    }})//****** Router ***********************MVC.Router = Backbone.Router.extend({    routes: {        "": "defaultRoute"  //http://localhost:22257/Theater/theater.htm    },    defaultRoute: function () {        //console.log("defaultRoute");        //new MVC.Collections.Templates()        MVC.watersheds = new MVC.Collections.Watersheds()        new MVC.Views.Watersheds({ collection: MVC.watersheds }); //Add this line        MVC.watersheds.fetch();        console.log('Aquifers');        MVC.aquifers = new MVC.Collections.Aquifers();        console.log('Aquifers Collection passed');        new MVC.Views.Aquifers({ collection: MVC.aquifers }); //Add this line        console.log('Aquifers- View passed');        MVC.aquifers.fetch();        console.log('Aquifers fetch passed');        //console.log(MVC.watersheds.length)    }})//****** Main App start ****************var appRouter = new MVC.Router();Backbone.history.start();
