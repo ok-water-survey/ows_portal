@@ -1,9 +1,9 @@
 ''' This fabfile is for use with deploying javascript-only applications to the cybercommons '''
 
-from fabric.api import *
-from fabric.contrib.files import exists
-from fabric.colors import red
 import os
+
+from fabric.api import *
+
 
 env.sitename = os.path.basename(os.getcwd())
 env.host = 'test.oklahomawatersurvey.org'
@@ -19,6 +19,7 @@ def ows_test():
     env.log_path = '%(path)s/log' % env
     env.hosts = ['test.oklahomawatersurvey.org']
 
+
 def ows_data():
     """
     Work on staging environment
@@ -29,6 +30,7 @@ def ows_data():
     env.log_path = '%(path)s/log' % env
     env.hosts = ['data.oklahomawatersurvey.org']
 
+
 def static_app():
     """
     Work on staging environment
@@ -38,6 +40,8 @@ def static_app():
     env.virtpy = '%(path)s/virtpy' % env
     env.log_path = '%(path)s/log' % env
     env.hosts = ['static.cybercommons.org']
+
+
 def static_apptest():
     """
     Work on staging environment
@@ -48,22 +52,27 @@ def static_apptest():
     env.log_path = '%(path)s/log' % env
     env.hosts = ['static.cybercommons.org']
 
+
 def setup_directories():
     run('mkdir -p %(path)s' % env)
+
 
 def setup():
     setup_directories()
     copy_working_dir()
 
+
 def deploy():
     copy_working_dir()
     bounce_apache()
+
 
 def copy_working_dir():
     local('tar --exclude fabfile.py --exclude fabfile.pyc -czf /tmp/deploy_%(sitename)s.tgz .' % env)
     put('/tmp/deploy_%(sitename)s.tgz' % env, '%(path)s/deploy_%(sitename)s.tgz' % env)
     run('cd %(path)s; tar -xf deploy_%(sitename)s.tgz; rm deploy_%(sitename)s.tgz' % env)
     local('rm /tmp/deploy_%(sitename)s.tgz' % env)
+
 
 def bounce_apache():
     """ Restart the apache web server """
