@@ -73,7 +73,7 @@ $(function () {
     $('#select_sites').change(function () {
         var source = $('#select_sites').val().split("_");
         var filt = "Source = '" + $('#select_sites').val() + "'";
-        removeFilter(2);
+        //removeFilter(2);
         if ($.inArray($('#select_sites').val(), loaded_sources) > -1) {
             updateFilter(filt);
             siteLayer.redraw();
@@ -99,40 +99,48 @@ $(function () {
 
         if ($('#select_sites').val() == 'MESONET') {
             $('#label5').text('Climate Division');
+	        $('#type-title').text('Climate Division:');
             $('#usgs_type').hide();
             $('#mesonet_type').show();
             $('#owrb_type').hide();
             $('#owrbmw_type').hide();
         } else if ($('#select_sites').val() == 'USGS') {
             $('#label5').text('Site Type');
+	        $('#type-title').text('Site Type:');
             $('#usgs_type').show();
             $('#mesonet_type').hide();
             $('#owrb_type').hide();
             $('#owrbmw_type').hide();
         } else if (source[0] === 'OWRB') {
             $('#label5').text('Well Type');
+	        $('#type-title').text('Well Type:');
             $('#usgs_type').hide();
             $('#mesonet_type').hide();
             $('#owrb_type').hide();
             $('#owrbmw_type').show();
         } else if ($('#select_sites').val() == 'OWRBMW') {
             $('#label5').text('Groundwater Well Project');
+	        $('#type-title').text('Groundwater Well Project:');
             $('#usgs_type').hide();
             $('#mesonet_type').hide();
             $('#owrb_type').show();
             $('#owrbmw_type').hide();
         }
     });
-    load_welllog_types();
-    load_owrbmw_types();
+    //load_welllog_types();
+    //load_owrbmw_types();
     load_well_log_sites();
-    $('#accord3').hide();
+    //$('#accord3').hide();
+	//set initial type
+	$('#type-title').text('Site Type:');
     $('#usgs_type').show()
+	//hide the rest
     $('#mesonet_type').hide();
     $('#owrb_type').hide();
     $('#owrbmw_type').hide();
     load_dash();
 });
+/*
 function load_welllog_types () {
     var url = baseurl + "/mongo/distinct/ows/owrb_well_logs/USE_CLASS/{}/";
     console.log('loading welllog_types');
@@ -151,7 +159,7 @@ function load_owrbmw_types () {
 
         });
     });
-}
+}*/
 function load_well_log_sites () {
     var url = baseurl + "/mongo/distinct/ows/owrb_well_logs/COUNTY/{}/"
 
@@ -164,6 +172,7 @@ function load_well_log_sites () {
     });
 
 }
+//Loads the OWS Watershed Dashboard tab
 function load_dash () {
     var url = baseurl + "/catalog/db_find/ows/data/{'spec':{'data_provider':'Watersheds'}}"
     var i = 0;
@@ -185,7 +194,7 @@ function load_dash () {
             });
 
         } catch (err) {
-            var err = 'error';
+	        var loaderr = 'error';
         }
     });
 }

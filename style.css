@@ -72,7 +72,9 @@
     padding-right: 1px;
     margin-bottom: 8px;
 }
-
+.cust-nav-header{
+    margin-left:3px;
+}
 /*simple cartjs*/
 .cartInfo {
     /*float:right;*/

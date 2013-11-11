@@ -128,7 +128,7 @@ $(window).load(function () {
                         // if a feature matches the above filter, use this symbolizer
                         symbolizer: {
                             fillColor: "#4EB3D3",
-                            fillOpacity:0.5,
+                            fillOpacity:0.6,
                             strokeColor:"#084594"
                         }
                     }),
@@ -141,14 +141,14 @@ $(window).load(function () {
                         // if a feature matches the above filter, use this symbolizer
                         symbolizer: {
                             fillColor: "#084594",
-                            fillOpacity:0.5,
+                            fillOpacity:0.6,
                             strokeColor:"#4EB3D3"
                         }
                     })
                 ]
                 }),
         "highlight": new OpenLayers.Style({ fillOpacity: 0.5, fillColor: "#F6358A", graphicZIndex: 2 }),
-        "select": {fillOpacity: 1, strokeColor: "white", graphicZIndex: 0}
+        "select": {fillOpacity: 1, strokeColor: "white",fillColor:"#FDBF6F", graphicZIndex: 0}
     });
     myStyles1 = new OpenLayers.StyleMap({"default": new OpenLayers.Style(null, {rules: [rule]})});
     siteLayer = new OpenLayers.Layer.Vector("Sites", {styleMap: myStyles1});
@@ -555,6 +555,7 @@ function load_sites (layer, url, source, mapping) {
             var pointFeature = new OpenLayers.Feature.Vector(point, null, null);
             var modtype = val[mapping.SiteType].replace(/-/g, '');//.site_tp_cd.replace(/-/g, '');
             modtype = modtype.replace(/\s+/g, '');
+	        modtype = modtype.replace(/,/g, '');
             modtype = modtype.replace('(', '_')
             modtype = modtype.replace(')', '')
             var aqui = '';
@@ -583,6 +584,7 @@ function load_sites (layer, url, source, mapping) {
         $.unblockUI();
     }); //end getJSON
 }
+/*
 function addFilter (source) {
     alert(source);
 }
@@ -609,7 +611,7 @@ function display_watershed () {
     } else {
         drawLayer.removeAllFeatures();
     }
-}
+}*/
 function updateFilter (fltr) {
     var filter;
     try {
