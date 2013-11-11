@@ -91,43 +91,51 @@ $(function () {
             //updateFilter(filt);
             //siteLayer.redraw();
         }
+
+        //id = "usgs_type"
+        //id = "mesonet_type"
+        //id = "owrb_type"
+        //id = "owrbmw_type"
+
         if ($('#select_sites').val() == 'MESONET') {
             $('#label5').text('Climate Division');
-            $('#idfilter').hide();
-            $('#mesofilter').show();
-            $('#owrbfilter').hide();
-            $('#owrbmw').hide();
+            $('#usgs_type').hide();
+            $('#mesonet_type').show();
+            $('#owrb_type').hide();
+            $('#owrbmw_type').hide();
         } else if ($('#select_sites').val() == 'USGS') {
             $('#label5').text('Site Type');
-            $('#idfilter').show();
-            $('#mesofilter').hide();
-            $('#owrbfilter').hide();
-            $('#owrbmw').hide();
+            $('#usgs_type').show();
+            $('#mesonet_type').hide();
+            $('#owrb_type').hide();
+            $('#owrbmw_type').hide();
         } else if (source[0] === 'OWRB') {
             $('#label5').text('Well Type');
-            $('#idfilter').hide();
-            $('#mesofilter').hide();
-            $('#owrbfilter').show();
-            $('#owrbmw').hide();
+            $('#usgs_type').hide();
+            $('#mesonet_type').hide();
+            $('#owrb_type').hide();
+            $('#owrbmw_type').show();
         } else if ($('#select_sites').val() == 'OWRBMW') {
             $('#label5').text('Groundwater Well Project');
-            $('#idfilter').hide();
-            $('#mesofilter').hide();
-            $('#owrbfilter').hide();
-            $('#owrbmw').show();
+            $('#usgs_type').hide();
+            $('#mesonet_type').hide();
+            $('#owrb_type').show();
+            $('#owrbmw_type').hide();
         }
     });
     load_welllog_types();
     load_owrbmw_types();
     load_well_log_sites();
     $('#accord3').hide();
-    $('#mesofilter').hide();
-    $('#owrbfilter').hide();
-    $('#owrbmw').hide();
+    $('#usgs_type').show()
+    $('#mesonet_type').hide();
+    $('#owrb_type').hide();
+    $('#owrbmw_type').hide();
     load_dash();
 });
 function load_welllog_types () {
-    var url = baseurl + "/mongo/distinct/ows/owrb_well_logs/USE_CLASS/{}/"
+    var url = baseurl + "/mongo/distinct/ows/owrb_well_logs/USE_CLASS/{}/";
+    console.log('loading welllog_types');
     $.getJSON(url, function (fdata) {
         $.each(fdata.sort(), function (key, val) {
             $('#owrbfilter').append('<option value=' + val.replace(/\s+/g, '') + '>' + val + '</option>');

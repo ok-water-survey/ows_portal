@@ -115,19 +115,21 @@ $(window).load(function () {
         "default": new OpenLayers.Style({ fillOpacity: 0.2, fillColor: "#F6358A", graphicZIndex: 2 },
                 {rules:[
                     new OpenLayers.Rule({
-                        filter: new OpenLayers.Filter.Function({
-                            evaluate:function(attributes){
-                                return attributes.STYLE_TYPE=="watershed";
-                            }
+                        //filter: new OpenLayers.Filter.Function({
+                        //    evaluate:function(attributes){
+                        //        return attributes.STYLE_TYPE=="watershed";
+                        //    }
 
-                        //filter: new OpenLayers.Filter.Comparison({
-                        //type: OpenLayers.Filter.Comparison.EQUAL_TO,
-                        //property: "properties.STYLE_TYPE", // the "foo" feature attribute
-                        //value: "watershed"
+                        filter: new OpenLayers.Filter.Comparison({
+                        type: OpenLayers.Filter.Comparison.EQUAL_TO,
+                        property: "STYLE_TYPE", // the "foo" feature attribute
+                        value: "watershed"
                         }),
                         // if a feature matches the above filter, use this symbolizer
                         symbolizer: {
-                            fillColor: "#F6358A" //"#4EB3D3"
+                            fillColor: "#4EB3D3",
+                            fillOpacity:0.5,
+                            strokeColor:"#084594"
                         }
                     }),
                     new OpenLayers.Rule({
@@ -138,89 +140,35 @@ $(window).load(function () {
                         }),
                         // if a feature matches the above filter, use this symbolizer
                         symbolizer: {
-                            fillColor: "#08589E",
-                            fillOpacity:0.7
+                            fillColor: "#084594",
+                            fillOpacity:0.5,
+                            strokeColor:"#4EB3D3"
                         }
                     })
                 ]
                 }),
         "highlight": new OpenLayers.Style({ fillOpacity: 0.5, fillColor: "#F6358A", graphicZIndex: 2 }),
-        "select": {fillOpacity: 0.5, strokeColor: "black", fillColor: "#43A2CA", graphicZIndex: 1}
+        "select": {fillOpacity: 1, strokeColor: "white", graphicZIndex: 0}
     });
     myStyles1 = new OpenLayers.StyleMap({"default": new OpenLayers.Style(null, {rules: [rule]})});
     siteLayer = new OpenLayers.Layer.Vector("Sites", {styleMap: myStyles1});
 
     $("#totmsg").show().html("Loading . . .");
     load_sites(siteLayer, baseurl + sources['USGS'].url, 'USGS', sources['USGS'].mapping);
-
-    $.getJSON(baseurl + "/catalog/db_find/ows/data/{'spec':{'data_provider':'OWRB'},'fields':['sources']}/", function (fdata) {
+    //loaded geojson files
+    /*$.getJSON(baseurl + "/catalog/db_find/ows/data/{'spec':{'data_provider':'OWRB'},'fields':['sources']}/", function (fdata) {
         $.each(fdata[0]['sources'], function (key, val) {
             $.each(val, function (key1, val1) {
                 $('#idstate').append('<option value=' + val1.ows_url[0] + '>' + key + '-' + key1 + '</option>');
             });
 
         });
-    });
-    //set the select with Aquifer Names
-    //console.log('right before Aquifer');
-
-   /* $.getJSON(baseurl + "/mongo/distinct/ows/aquifers/properties.NAME/{}/", function (fdata) {
-        fdata.sort();
-        $.each(fdata, function (key, val) {
-            $('#idaquifer').append('<option value=' + val + '>' + val + '</option>');
-        });
-
-
-    });
-    //Set the select with Sub Watershed
-    $.getJSON(baseurl + "/catalog/db_find/ows/data/%7B'spec':%7B'data_provider':'Watersheds'%7D%7D", function (fdata) {
-        $.each(fdata[0], function (key, val) {
-            try {
-                if (val.name !== undefined) {
-                    $('#idwatershed').append('<option value=' + key + '>' + val.name + '</option>');
-                    $.each(val.subs, function (k, v) {
-                        $('#idwatershed').append('<option value=' + k + '>&nbsp;&nbsp; - ' + v + '</option>');
-                    })
-                }
-            } catch (err) {
-                var msg = "error";
-            }
-
-        });
     });*/
-//        $.getJSON(baseurl +"/mongo/distinct/ows/watersheds/properties.HUC/{}/", function(fdata){
-//            fdata.sort();
-//            var objdata,oval,huc,temp;
-    /// var objd ={};
-//            $.each(fdata, function(key,val) {
-    // alert(val);
-//                var url = baseurl +"/mongo/db_find/ows/watersheds/{'spec':{'properties.HUC':'" + $.trim(val) + "'},'fields':['properties']}/"
-//                $.getJSON(url, function(objdata){
-    //  alert(url);
-    //$.each(fdata, function(key,val) {
-    //$.each(objdata, function(okey,oval) {
-    //   alert(oval.properties.NAME);
-    //          var objd ={};
-//                        oval = objdata[0].properties.NAME
-//                        huc= objdata[0].properties.HUC
-    //if(val == oval.properties.HUC){
-    //        objd[oval.properties.HUC]=oval.properties.NAME
-//                        temp= '<a onclick="addFilter("' + huc + '");" href="javascript:void(0);"> '+ oval +'</a>';
-    // $('#idwatershed_ul').append('<li><a onclick="addFilter("' + huc + '");" href="javascript:void(0);"> '+ oval +'</a>');
-    //alert(temp);
-//                        $('#idwatershed').append('<option value='+ huc + '>'+ oval +'</option>');
-    // }
-    //});
-//                });
-
-    //});
-    //  console.log(objd)
-
-
-//        });
-
+    drawLayer = new OpenLayers.Layer.Vector("Draw Layer", {styleMap: myStyles, 'displayInLayerSwitcher': false});//    new OpenLayers.Style({ fillOpacity: 1, fillColor: "#F6358A", graphicZIndex: 2 })});
+    filterLayer = new OpenLayers.Layer.Vector("Filter Layer", {styleMap: myStyles});
+    map.addLayer(drawLayer);//[polygonLayer,circleLayer,boxLayer]);
+    map.addLayer(filterLayer);
     map.addLayer(siteLayer);
-
     map.addControl(new OpenLayers.Control.MousePosition({emptyString: "Oklahoma Water Survey"}));
     map.addControl(new OpenLayers.Control.LayerSwitcher());
     map.addControl(new OpenLayers.Control.ScaleLine());
@@ -228,14 +176,7 @@ $(window).load(function () {
     selStyle = new OpenLayers.StyleMap({
         "default": new OpenLayers.Style({ display: 'none' })
     });
-    //selStyle1 =new OpenLayers.Style({ fillOpacity: 1, fillColor: "#F6358A", graphicZIndex: 2 })
-    drawLayer = new OpenLayers.Layer.Vector("Draw Layer", {styleMap: myStyles, 'displayInLayerSwitcher': false});//    new OpenLayers.Style({ fillOpacity: 1, fillColor: "#F6358A", graphicZIndex: 2 })});
-    filterLayer = new OpenLayers.Layer.Vector("Filter Layer", {styleMap: myStyles});
-    //var circleLayer =  new OpenLayers.Layer.Vector("Circle layer", {styleMap: selStyle});
-    //var boxLayer =     new OpenLayers.Layer.Vector("Box layer", {styleMap: selStyle});
-    map.addLayer(drawLayer);//[polygonLayer,circleLayer,boxLayer]);
-    map.addLayer(filterLayer);
-    //polygonLayer
+
     selectControls = { polygon: new OpenLayers.Control.DrawFeature(drawLayer, OpenLayers.Handler.Polygon),
         circle: new OpenLayers.Control.DrawFeature(drawLayer, OpenLayers.Handler.RegularPolygon, { handlerOptions: { sides: 40 } }),
         box: new OpenLayers.Control.DrawFeature(drawLayer, OpenLayers.Handler.RegularPolygon, { handlerOptions: { sides: 4, irregular: true } }),
@@ -248,26 +189,22 @@ $(window).load(function () {
     for (var key in selectControls) {
         map.addControl(selectControls[key]);
         selectControls[key].events.register("featureadded", this, function (f) {
-            //OpenLayers.Element.addClass(map.viewPortDiv, "olCursorWait");
-            //map.div.style.cursor='wait';
             $.each(siteLayer.features, function (key, val) {
                 if (val.geometry.intersects(f.feature.geometry)) {
                     onFeatureSelect(val);
                     selectControls.select.highlight(val);
                 }
             });
-            // map.div.style.cursor='default';
-            // OpenLayers.Element.removeClass(map.viewPortDiv, "olCursorWait");
         });
     }
 
     document.getElementById("noneToggle").checked = true;
     selectControls.select.activate();
+
     //Disable zoomWheel
     controls = map.getControlsByClass('OpenLayers.Control.Navigation');
     for (var i = 0; i < controls.length; ++i)
         controls[i].disableZoomWheel();
-//console.log('Map.js load finish')
     selectFeature = new OpenLayers.Control.SelectFeature(filterLayer);
     //selectFeature.activate();
 }); //end window Load
@@ -339,15 +276,6 @@ $(document).ready(function () {
     });
 
     $("#searchState").click(function () {
-        //var selStates = $("#idstate").val() || [];
-        //var sstates=[];
-        //if (selStates != "") {
-        //    	$.each(selStates, function(key, value) {
-        //    		sstates.push('"'+value+'"');
-        //    	});
-        //    	searchState (sstates);
-        //    	$("#accordState").collapse('toggle');
-        //}
         addlayer();
     });
     $("#search_aquifer").click(function () {
@@ -737,9 +665,9 @@ function resetFeatures (showFilter) {
 
 }
 function showFeature (feature, showFilter) {
-    console.log('showfilter');
+    //console.log('showfilter');
     console.log(feature);
-    if (showFilter.attr('checked') ? true : false) {
+    //if (showFilter.attr('checked') ? true : false) {
         var in_options = {'internalProjection': map.projection, 'externalProjection': map.projection};
         var geojson_format = new OpenLayers.Format.GeoJSON(in_options);
         var pre = '{"type": "FeatureCollection","features":'
@@ -749,9 +677,9 @@ function showFeature (feature, showFilter) {
             features = [features];
         }
         filterLayer.addFeatures(features);
-    } else {
-        filterLayer.removeAllFeatures();
-    }
+    //} else {
+    //    filterLayer.removeAllFeatures();
+    //}
 }
 function drawFeature (url) {
     var in_options = {'internalProjection': map.projection, 'externalProjection': map.projection};

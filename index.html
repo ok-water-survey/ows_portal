@@ -35,9 +35,23 @@
     <script type="text/javascript" src="portal.js"></script>
     <script type="text/javascript" src="cctasks.js"></script>
     <link rel=stylesheet href="style.css" type="text/css" media="screen, print">
-    <script>
+    <script type="javascript">
         jQuery(document).ready(function ($) {
             $('#myTab').tab();
+            //Override Openlayers
+            OpenLayers.Handler.Feature.prototype.activate = function () {
+                var activated = false;
+                if (OpenLayers.Handler.prototype.activate.apply(this, arguments)) {
+                    //this.moveLayerToTop(); //override to not have switch
+                    this.map.events.on({
+                        "removelayer": this.handleMapEvents,
+                        "changelayer": this.handleMapEvents,
+                        scope: this
+                    });
+                    activated = true;
+                }
+                return activated;
+            };
         });
     </script>
 </head>
@@ -149,8 +163,8 @@
                                 <ul id="currentFilt_type" class="nav filter">
                                     <b>Type:</b>
                                 </ul>
-                                <input style="margin-left:35px" class="show_fltr btn btn-info" type="checkbox"
-                                       value="Show Aquifer">&nbsp;Show Filters</br
+                                <!--<input style="margin-left:35px" class="show_fltr btn btn-info" type="checkbox"
+                                       value="Show Aquifer">&nbsp;Show Filters</br-->
                             </div>
                             <!--</ul>-->
                             <li class="nav-header"> Select Filter</li>
@@ -198,7 +212,11 @@
                                         <div class="accordion-inner"
                                              style="padding-left:5px;padding-top:5px;padding-right:1px;">
                                             <h5 id="label5">Site Type</h5>
-                                            <select multiple id="idfilter" class="span12" size="20">
+                                            <div id="usgs_type" class="filter-dim filter-ul"></div>
+                                            <div id="mesonet_type" class="filter-dim filter-ul"></div>
+                                            <div id="owrb_type" class="filter-dim filter-ul"></div>
+                                            <div id="owrbmw_type" class="filter-dim filter-ul"></div>
+                                            <!--<select multiple id="idfilter" class="span12" size="20">
                                                 <option value="ST">Stream</option>
                                                 <option value="STCA">&nbsp; &nbsp; Canal</option>
                                                 <option value="STDCH">&nbsp; &nbsp; Ditch</option>
@@ -206,22 +224,22 @@
                                                 <option value="SP">Spring</option>
                                                 <option value="GW">Well</option>
                                                 <!--<option value="GWCR">&nbsp; &nbsp; Collector or Ranney type well</option>
-                                                <option value="GWMW">&nbsp; &nbsp; Multiple wells</option>-->
+                                                <option value="GWMW">&nbsp; &nbsp; Multiple wells</option>->
                                                 <option value="GWTH">&nbsp; &nbsp; Test hole</option>
                                                 <option value="SBTSM">Other subsurface</option>
                                                 <option value="SBTSM">&nbsp; &nbsp; Tunnel, shaft, or mine</option>
                                                 <option value="LAEX">Land</option>
                                                 <option value="LAEX">&nbsp; &nbsp; Excavation</option>
-                                                <!--<option value="LASNK">&nbsp; &nbsp; Sinkhole</option>-->
+                                                <!--<option value="LASNK">&nbsp; &nbsp; Sinkhole</option>->
                                                 <option value="LASH">&nbsp; &nbsp; Soil hole</option>
                                                 <option value="FACS">Facility</option>
                                                 <option value="FACS">&nbsp; &nbsp; Combined sewer</option>
                                                 <option value="FAQC">&nbsp; &nbsp; Laboratory or sample-prep area
                                                 </option>
                                                 <option value="FALF">&nbsp; &nbsp; Landfill</option>
-                                                <!-- <option value="FAOF">&nbsp; &nbsp; Outfall</option>-->
+                                                <!-- <option value="FAOF">&nbsp; &nbsp; Outfall</option>->
                                                 <option value="FASTS">&nbsp; &nbsp; Storm sewer</option>
-                                                <!-- <option value="FAWTP">&nbsp; &nbsp; Water-supply treatment plant</option>-->
+                                                <!-- <option value="FAWTP">&nbsp; &nbsp; Water-supply treatment plant</option>->
                                             </select>
                                             <select multiple id="mesofilter" class="span12" size="10">
                                                 <option value="Panhandle">Panhandle</option>
@@ -237,8 +255,8 @@
                                             <select multiple id="owrbfilter" class="span12" size="10">
                                             </select>
                                             <select multiple id="owrbmw" class="span12" size="10">
-                                            </select>
-                                                                <span style="margin-left:25px">( Double Click to Select )<span><br>
+                                            </select>->
+                                                                <span style="margin-left:25px">( Double Click to Select )<span><br>-->
                                         </div>
                                     </div>
                                 </div>

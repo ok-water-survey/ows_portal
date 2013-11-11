@@ -29,6 +29,21 @@
 }
 
 /* MVC style inclusion */
+.filter-dim {
+    height: 300px;
+    overflow: auto;
+}
+
+.filter-dim ul {
+    list-style-type: none;
+    font-size: 12px;
+    margin: 0 0 0 6px;
+}
+
+.filter a {
+    margin-left: 2px;
+}
+
 #watershd {
     height: 300px;
     overflow: auto;
@@ -55,6 +70,7 @@
     display: none;
     padding-left: 1px;
     padding-right: 1px;
+    margin-bottom: 8px;
 }
 
 /*simple cartjs*/
