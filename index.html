@@ -150,21 +150,19 @@
                                 <option value="OWRBMW">OWRB Groundwater Monitor Wells</option>
                             </select>
                             <li class="nav-header">Current Filter</li>
-                            <div id='curretnfilter'>
+                            <div id='curretnfilter' style="margin-left:10px;">
                                 <ul id="currentFilt" class="nav nav-list" style="padding-left:1px;padding-right:1px;">
 
                                 </ul>
                                 <ul id="currentFilt_wshd" class="nav filter">
-                                    <b>Watershed:</b>
+                                    <span class="nav-header">Watershed:</span>
                                 </ul>
                                 <ul id="currentFilt_aquifer" class="nav filter">
-                                    <b>Aquifer:</b>
+                                    <span class="nav-header">Aquifer:</span>
                                 </ul>
                                 <ul id="currentFilt_type" class="nav filter">
-                                    <b>Type:</b>
+                                    <span id="type-title" class="nav-header">Type:</span>
                                 </ul>
-                                <!--<input style="margin-left:35px" class="show_fltr btn btn-info" type="checkbox"
-                                       value="Show Aquifer">&nbsp;Show Filters</br-->
                             </div>
                             <!--</ul>-->
                             <li class="nav-header"> Select Filter</li>
@@ -178,13 +176,7 @@
 
                                         <div class="accordion-inner"
                                              style="padding-left:5px;padding-top:5px;padding-right:1px;">
-                                            <!--<ul id="idwatershed_ul" class="nav nav-list" style="" >
-                                            </ul>-->
                                             <div id="watershd"></div>
-                                            <!--<select multiple id="idwatershed"  size="25" style="width:100%" >
-                                            </select>
-                                            <span style="margin-left:25px">( Double Click to Select )<span><br>
-                                            <input id="show_watershed" style="margin-left:35px" class="btn btn-info" type="checkbox" value="Show Aquifer">&nbsp;Show Watershed</br>-->
                                         </div>
                                     </div>
                                 </div>
@@ -196,67 +188,23 @@
                                     <div id="accordaquifer" class="accordion-body collapse">
                                         <div class="accordion-inner" style="padding:1px 1px;">
                                             <div id="aquifers"></div>
-                                            <!--<select multiple id="idaquifer" class="span12"  size="25">
-                                            </select>
-                                            <span style="margin-left:25px">( Double Click to Select )</span><br>
-                                            <input id="show_aquifer" style="margin-left:35px" class="btn btn-info" type="checkbox" value="Show Aquifer">&nbsp;Show Aquifer</br>-->
                                         </div>
                                     </div>
                                 </div>
                                 <div id="accordType" class="accordion-group">
                                     <div class="accordion-heading">
-                                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2"
+                                        <a class="accordion-toggle " data-toggle="collapse" data-parent="#accordion2"
                                            href="#accordtype">Site Classification</a>
                                     </div>
                                     <div id="accordtype" class="accordion-body collapse">
                                         <div class="accordion-inner"
                                              style="padding-left:5px;padding-top:5px;padding-right:1px;">
-                                            <h5 id="label5">Site Type</h5>
+                                            <h5 id="label5" class="nav-header" style="margin-left:-7px;">Site Type</h5>
+
                                             <div id="usgs_type" class="filter-dim filter-ul"></div>
                                             <div id="mesonet_type" class="filter-dim filter-ul"></div>
                                             <div id="owrb_type" class="filter-dim filter-ul"></div>
                                             <div id="owrbmw_type" class="filter-dim filter-ul"></div>
-                                            <!--<select multiple id="idfilter" class="span12" size="20">
-                                                <option value="ST">Stream</option>
-                                                <option value="STCA">&nbsp; &nbsp; Canal</option>
-                                                <option value="STDCH">&nbsp; &nbsp; Ditch</option>
-                                                <option value="LK">Lake</option>
-                                                <option value="SP">Spring</option>
-                                                <option value="GW">Well</option>
-                                                <!--<option value="GWCR">&nbsp; &nbsp; Collector or Ranney type well</option>
-                                                <option value="GWMW">&nbsp; &nbsp; Multiple wells</option>->
-                                                <option value="GWTH">&nbsp; &nbsp; Test hole</option>
-                                                <option value="SBTSM">Other subsurface</option>
-                                                <option value="SBTSM">&nbsp; &nbsp; Tunnel, shaft, or mine</option>
-                                                <option value="LAEX">Land</option>
-                                                <option value="LAEX">&nbsp; &nbsp; Excavation</option>
-                                                <!--<option value="LASNK">&nbsp; &nbsp; Sinkhole</option>->
-                                                <option value="LASH">&nbsp; &nbsp; Soil hole</option>
-                                                <option value="FACS">Facility</option>
-                                                <option value="FACS">&nbsp; &nbsp; Combined sewer</option>
-                                                <option value="FAQC">&nbsp; &nbsp; Laboratory or sample-prep area
-                                                </option>
-                                                <option value="FALF">&nbsp; &nbsp; Landfill</option>
-                                                <!-- <option value="FAOF">&nbsp; &nbsp; Outfall</option>->
-                                                <option value="FASTS">&nbsp; &nbsp; Storm sewer</option>
-                                                <!-- <option value="FAWTP">&nbsp; &nbsp; Water-supply treatment plant</option>->
-                                            </select>
-                                            <select multiple id="mesofilter" class="span12" size="10">
-                                                <option value="Panhandle">Panhandle</option>
-                                                <option value="NorthCentral">North Central</option>
-                                                <option value="Northeast">Northeast</option>
-                                                <option value="WestCentral">West Central</option>
-                                                <option value="Central">Central</option>
-                                                <option value="EastCentral">East Central</option>
-                                                <option value="Southwest">Southwest</option>
-                                                <option value="SouthCentral">South Central</option>
-                                                <option value="Southeast">Southeast</option>
-                                            </select>
-                                            <select multiple id="owrbfilter" class="span12" size="10">
-                                            </select>
-                                            <select multiple id="owrbmw" class="span12" size="10">
-                                            </select>->
-                                                                <span style="margin-left:25px">( Double Click to Select )<span><br>-->
                                         </div>
                                     </div>
                                 </div>
