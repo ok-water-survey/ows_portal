@@ -39,7 +39,7 @@ $(document).ready(function () {
         //"uiparams":   ['#product','#country','#start_date','#end_date', '#email'],// UI Selected
         "status": '#status',
         "spinner": '#spinner',
-        "pollinterval": 2000,
+        "pollinterval": 4000,
         "onPending": function (task_id) {
             setTimeout(function () {
                 poll_status(task_id);

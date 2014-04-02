@@ -25,25 +25,69 @@
     height: 100%;
     background: url(spinner.gif) center center no-repeat;
     opacity: 1;
-    z-index = 800;
+    z-index: 800;
 }
-
+.add_filter {
+    white-space: nowrap;
+    overflow: hidden;
+}
+.top_mar {
+    padding-top:18px;
+}
+div#featurePopup img {
+    max-width:none;
+}
+#iafeaturePopup_close {
+    margin-right: 15px;
+}
 /* MVC style inclusion */
+.undo_main{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.undo_sub{
+    margin-left: 18px;
+}
 .filter-dim {
     height: 300px;
     overflow: auto;
 }
-
+div#currentSource ul {
+    white-space: nowrap;
+    overflow: hidden;
+}
 .filter-dim ul {
     list-style-type: none;
     font-size: 12px;
     margin: 0 0 0 6px;
 }
-
+.accordion-body.in {
+    overflow:visible;
+}
+.btn-xs {
+    height:20px;
+    padding-top: 0px;
+    padding-left: 2px;
+}
+.btn-filter{
+    margin-left: 18px;
+}
 .filter a {
     margin-left: 2px;
 }
-
+#datasource ul{
+    list-style-type: none;
+    font-size: 12px;
+    margin: 0 0 0 6px;
+}
+#currentSource {
+    max-height: 300px;
+    overflow: auto;
+}
+#datasource {
+    height: 300px;
+    overflow: auto;
+}
 #watershd {
     height: 300px;
     overflow: auto;
@@ -99,6 +143,13 @@
     margin-left: 30px;
     cursor: pointer;
     -webkit-transition: background-color .2s linear;
+}
+
+.truncate {
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .cartInfo:hover {

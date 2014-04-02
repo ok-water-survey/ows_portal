@@ -1,6 +1,8 @@
 $(function () {
 	$('#status').hide();
-	$('#spinner').hide()
+	$('#spinner').hide();
+	$('.hide').hide();
+	$("[rel=tooltip]").tooltip({ placement: 'right'});
 	simpleCart({
 		//Setting the Cart Columns for the sidebar cart display.
 		cartColumns: [
@@ -23,7 +25,7 @@ $(function () {
 		cartStyle: 'div',
 		checkout: {
 			type: "SendForm",
-			url: "http://test.oklahomawatersurvey.org/tools/download/"
+			url: "/tools/download/"
 		}
 	});
 	simpleCart.bind("beforeAdd", function (item) {
@@ -42,10 +44,19 @@ $(function () {
 			var cart_object = localStorage['simpleCart_items'];
 			var opt = {'taskname': 'owsq.data.download.main_download.data_download', 'kwargs': {'data': cart_object}};
 			calltask(opt);
+
 		}
 		$('.simpleCart_checkout').attr('disabled', '');
+		//console.log(e);
+		//console.log(v);
+		//return e.preventDefault(); //.preventDefault;// .preventDefault;
+
 		return false;
 	});
+	//simpleCart.bind( 'error' , function(message){
+    //    alert( message );
+	//});
+
 	$("#header .cartInfo").toggle(function () {
 		$('.item-query').hide();
 		$("#cartPopover").show();
@@ -71,8 +82,9 @@ $(function () {
 		$("#cartPopover").offset({ left: $(document).width() - 421, top: window.scrollY + 65});
 	});
 	$('#select_sites').change(function () {
+		//siteLayer.styleMap = my
 		set_layers();
-
+		//siteLayer.styleMap =  myStyles1;
 	});
 	$('#subdata').change(function(){
 		set_layers();
@@ -89,13 +101,9 @@ $(function () {
 			$('#subdata').show();
 		} else {
 			$('#subdata').hide();
-
-			source = $('#select_sites').val() //.split("_");
-			//source = source[0]
+			source = $('#select_sites').val()
 			filt = "Source = '" + $('#select_sites').val() + "'";
 		}
-		//console.log(source);
-		//removeFilter(2);
 		if ($.inArray(source, loaded_sources) > -1) {
 			updateFilter(filt);
 			siteLayer.redraw();
@@ -107,21 +115,12 @@ $(function () {
 				myurl = part_url[0] + 'owrb_well_logs' + part_url[1] + source[1] + part_url[2]
 				load_sites(siteLayer, myurl, $('#county').val(), sources[source[0]].mapping);
 			} else {
-				//console.log(sources[source].url)
+				console.log(sources[source].url)
 				load_sites(siteLayer, baseurl + sources[source].url, source, sources[source].mapping);
 			}
-
-
-			//updateFilter(filt);
-			//siteLayer.redraw();
 		}
-
 		apply_filter();
 		apply_current();
-		//id = "usgs_type"
-		//id = "mesonet_type"
-		//id = "owrb_type"
-		//id = "owrbmw_type"
 
 		if ($('#select_sites').val() == 'MESONET') {
 			$('#label5').text('Climate Division');
@@ -152,16 +151,9 @@ $(function () {
 			$('#owrb_type').show();
 			$('#owrbmw_type').hide();
 		}
-
-
-
-
 	}
-	//load_welllog_types();
-	//load_owrbmw_types();
 	load_well_log_sites();
-	//$('#accord3').hide();
-	//set initial type
+
 	$('#type-title').text('Site Type:');
 	$('#usgs_type').show()
 	//hide the rest

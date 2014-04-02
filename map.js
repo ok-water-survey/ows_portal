@@ -10,6 +10,7 @@
 var verDate = {"0": "0.01", "1": "18 December 2012"};
 //Declarations
 var map, nav, options, siteLayer, selectControls, siteStyles, drawLayer, filterLayer, selectFeature;
+var evt_bool = true;
 var lay_osm, glayers, mypop;
 var sitesTotal = [], sitesActive = [], sitesSel = [];
 var baseurl = "";  //"http://test.cybercommons.org";
@@ -20,16 +21,28 @@ var savflg = 0;
 var qry = '';
 var enqry = '';
 var fff;
-var stylesColor = {"0": "#0000ff", "1": "#b575b5", "2": "#f5914d", "3": "#bd2126", "4": "#8cba52", "5": "#8cc4d6", "6": "#007a63", "7": "#705421", "8": "#69c4ad", "9": "#008000", "10": "#000080", "11": "#800080", "12": "#c0c0c0"};
+var colorcount =0
+var stylesColor = {0: "#0000ff", 1: "#b575b5", 2: "#f5914d", 3: "#bd2126", 4: "#8cba52", 5: "#8cc4d6", 6: "#007a63", 7: "#705421", 8: "#69c4ad", 9: "#008000", 10: "#000080", 11: "#800080", 12: "#c0c0c0"};
 // use a CQL parser for easy filter creation
 var format = new OpenLayers.Format.CQL();
+
+//var colorlookup={"USGS":{fillColor: "#5258ba"},"OWRBMWW":{fillColor: "#bd2126"},"OWRB":{fillColor: "#5258ba"},
+//				"OWRBMW":{fillColor: "#bd2126"},"WQP":{fillColor: "#5258ba"}}
+//var ss =
 // this rule will get a filter from the CQL text in the form
+
+	//myStyles1.addUniqueValueRules("Default","Source",colorlookup)
+var colorlookup={"USGS":{fillColor: "#5258ba"},"OWRBMWW":{fillColor: "#bd2126"},"OWRB":{fillColor: "#5258ba"},
+				"OWRBMW":{fillColor: "#bd2126"},"WQP":{fillColor: "#5258ba"}}
+
+
 var rule = new OpenLayers.Rule({
 	// We could also set a filter here.  E.g. #ff0000 #ffcccc
 	// filter: format.read("Taxon >= 'S' AND Taxon <= 'U'"),
 	//Green color "#8CBA52",
+	//"#5258ba"
 	symbolizer: {
-		fillColor:"#5258ba",
+		fillColor: '${color}',
 		strokeColor: "#000000",
 		fillOpacity: "0.9",
 		strokeWidth: "1",
@@ -37,34 +50,39 @@ var rule = new OpenLayers.Rule({
 		pointRadius: "4.0"
 	}
 });
-
-var sources = {'USGS': {'url': "/mongo/db_find/ows/usgs_site/{'spec':{'status':'Active'}}/",
+var myStyles1 = new OpenLayers.StyleMap({"default": new OpenLayers.Style(null, {rules: [rule]})});
+//var newRule = myStyles1.addUniqueValueRules("default","Source",colorlookup)
+var sources = {'USGS': {'url': "/mongo/db_find/ows/usgs_site/{'spec':{'status':'Active'}}/?callback=?",
 	'mapping': {'REF_NO': 'site_no', 'Sitename': 'station_nm', 'Status': 'status',
 		'SiteType': 'site_tp_cd', 'lat': 'dec_lat_va', 'lon': 'dec_long_va',
 		'aquifer': 'aquifer', 'huc_4': 'huc_4', 'huc_8': 'huc_8'}
 },
-	'MESONET': {'url': "/mongo/db_find/ows/mesonet_site/{'spec':{'status':'Active'}}",
+	'MESONET': {'url': "/mongo/db_find/ows/mesonet_site/{'spec':{'status':'Active'}}/?callback=?",
 		'mapping': {'REF_NO': 'stid', 'Sitename': 'name', 'Status': 'status',
 			'SiteType': 'cdiv', 'lat': 'nlat', 'lon': 'elon',
 			'aquifer': 'aquifer', 'huc_4': 'huc_4', 'huc_8': 'huc_8' }
 	},
-	'OWRB': {'url': "/mongo/db_find/ows/%s/{'spec':{'COUNTY':'%s'}}",
+	'OWRB': {'url': "/mongo/db_find/ows/%s/{'spec':{'COUNTY':'%s'}}/?callback=?",
 		'mapping': {'REF_NO': 'WELL_ID', 'Sitename': 'name', 'Status': 'status',
 			'SiteType': 'USE_CLASS', 'lat': 'LATITUDE', 'lon': 'LONGITUDE',
 			'aquifer': 'aquifer', 'huc_4': 'huc_4', 'huc_8': 'huc_8' }
 	},
-	'OWRBMW': {'url': "/mongo/db_find/ows/owrb_monitor_sites/{'spec':{'status':'Active'}}",
+	'OWRBMW': {'url': "/mongo/db_find/ows/owrb_monitor_sites/{'spec':{'status':'Active'}}/?callback=?",
 		'mapping': {'REF_NO': 'WELL_ID', 'Sitename': 'name', 'Status': 'status',
 			'SiteType': 'PROJECT', 'lat': 'LATITUDE', 'lon': 'LONGITUDE',
 			'aquifer': 'aquifer', 'huc_4': 'huc_4', 'huc_8': 'huc_8' }
+	},
+	'OWRBMWW': {'url': "/mongo/db_find/ows/owrb_water_sites/{}/?callback=?",
+		'mapping': {'REF_NO': 'WELL_ID', 'Sitename': 'WELL_ID', 'Status': 'LL_METHOD',
+			'SiteType': 'USE_CLASS', 'lat': 'LATITUDE', 'lon': 'LONGITUDE',
+			'aquifer': 'aquifer', 'huc_4': 'huc_4', 'huc_8': 'huc_8' }
 	}
 }
-var filter = {'watershed': null, 'aquifer': null, 'type': null};
-var cfilter = {'watershed': null, 'aquifer': null, 'type': null};
+var filter = {'source': null, 'watershed': null, 'aquifer': null, 'type': null};
+var cfilter = {'source': null, 'watershed': null, 'aquifer': null, 'type': null};
 //on window load
-$(window).load(function () {
+$(window).ready(function () {
 	//console.log('Map.js start')
-
 	options = {
 		spericalMercator: true,
 		projection: new OpenLayers.Projection("EPSG:900913"),
@@ -77,7 +95,6 @@ $(window).load(function () {
 		maxExtent: new OpenLayers.Bounds([ -19803292.13, -3405054.49, 547896.95, 15497748.74 ])
 	}
 	map = new OpenLayers.Map('map', options);
-	//ccbasemap = new OpenLayers.Layer.XYZ("ccbasemap", "http://129.15.41.144:8080/ccbasemap/${z}/${x}/${y}.png", { 'sphericalMercator' : true });
 	glayers = [
 		new OpenLayers.Layer.Google(
 			"Google Physical",
@@ -110,17 +127,11 @@ $(window).load(function () {
 		"default": new OpenLayers.Style({ fillOpacity: 1, pointRadius: 3.5, strokeWidth: 1, fillColor: "#8CBA52", graphicZIndex: 1 }),
 		"select": new OpenLayers.Style({ fillOpacity: 0.2, fillColor: "#F6358A", graphicZIndex: 1 })
 	});
-	//{ fillOpacity: 0.2, fillColor: "#F6358A", graphicZIndex: 1 }
 
 	myStyles = new OpenLayers.StyleMap({
 		"default": new OpenLayers.Style({ fillOpacity: 0.2, fillColor: "#F6358A", graphicZIndex: 2 },
 			{rules: [
 				new OpenLayers.Rule({
-					//filter: new OpenLayers.Filter.Function({
-					//    evaluate:function(attributes){
-					//        return attributes.STYLE_TYPE=="watershed";
-					//    }
-
 					filter: new OpenLayers.Filter.Comparison({
 						type: OpenLayers.Filter.Comparison.EQUAL_TO,
 						property: "STYLE_TYPE", // the "foo" feature attribute
@@ -151,20 +162,17 @@ $(window).load(function () {
 		"highlight": new OpenLayers.Style({ fillOpacity: 0.5, fillColor: "#F6358A", graphicZIndex: 2 }),
 		"select": {fillOpacity: 1, strokeColor: "white", fillColor: "#8CBA52", graphicZIndex: 0}
 	});
-	myStyles1 = new OpenLayers.StyleMap({"default": new OpenLayers.Style(null, {rules: [rule]})});
+	var ss =  {"default": new OpenLayers.Style(null, {rules: [rule]}),"select":new OpenLayers.Style({fillColor:"#F6358A"}, {rules: [rule]})
+				}
+	//myStyles1 = new OpenLayers.StyleMap({"default": new OpenLayers.Style(null, {rules: [rule]})});
+	//myStyles1.addUniqueValueRules("Default","Source",colorlookup)
+	//var colorlookup={"USGS":{fillColor: "#5258ba"},"OWRBMWW":{fillColor: "#bd2126"},"OWRB":{fillColor: "#5258ba"},
+	//				"OWRBMW":{fillColor: "#bd2126"},"WQP":{fillColor: "#5258ba"}}
+	//newRule = myStyles1.addUniqueValueRules("default","Source",colorlookup)
 	siteLayer = new OpenLayers.Layer.Vector("Sites", {styleMap: myStyles1});
-
+	//siteLayer = new OpenLayers.Layer.Vector("Sites", {styleMap: ss});
 	$("#totmsg").show().html("Loading . . .");
-	load_sites(siteLayer, baseurl + sources['USGS'].url, 'USGS', sources['USGS'].mapping);
-	//loaded geojson files
-	/*$.getJSON(baseurl + "/catalog/db_find/ows/data/{'spec':{'data_provider':'OWRB'},'fields':['sources']}/", function (fdata) {
-	 $.each(fdata[0]['sources'], function (key, val) {
-	 $.each(val, function (key1, val1) {
-	 $('#idstate').append('<option value=' + val1.ows_url[0] + '>' + key + '-' + key1 + '</option>');
-	 });
-
-	 });
-	 });*/
+	load_sites(siteLayer, baseurl + sources['USGS'].url, 'USGS', sources['USGS'].mapping,"#437C17");
 	drawLayer = new OpenLayers.Layer.Vector("Draw Layer", {styleMap: myStyles, 'displayInLayerSwitcher': false});//    new OpenLayers.Style({ fillOpacity: 1, fillColor: "#F6358A", graphicZIndex: 2 })});
 	filterLayer = new OpenLayers.Layer.Vector("Filter Layer", {styleMap: myStyles});
 	map.addLayer(drawLayer);//[polygonLayer,circleLayer,boxLayer]);
@@ -173,7 +181,7 @@ $(window).load(function () {
 	map.addControl(new OpenLayers.Control.MousePosition({emptyString: "Oklahoma Water Survey"}));
 	map.addControl(new OpenLayers.Control.LayerSwitcher());
 	map.addControl(new OpenLayers.Control.ScaleLine());
-	map.addControl(new OpenLayers.Control.OverviewMap());
+	//map.addControl(new OpenLayers.Control.OverviewMap());
 	selStyle = new OpenLayers.StyleMap({
 		"default": new OpenLayers.Style({ display: 'none' })
 	});
@@ -208,9 +216,9 @@ $(window).load(function () {
 		controls[i].disableZoomWheel();
 	selectFeature = new OpenLayers.Control.SelectFeature(filterLayer);
 	//selectFeature.activate();
-}); //end window Load
+//}); //end window Load
 
-$(document).ready(function () {
+//$(document).ready(function () {
 	//console.log('Map.js ready start')
 	$("#map").resizable();
 
@@ -403,7 +411,6 @@ $(document).ready(function () {
 				}
 			}
 		}
-		//alert(filt)
 		if (filt === '') {
 			siteLayer.styleMap = siteStyles;
 			siteLayer.redraw();
@@ -414,7 +421,6 @@ $(document).ready(function () {
 	});
 	$("#clear_filter").click(function () {
 		siteLayer.styleMap = siteStyles;
-		//rule.filter = None;
 		siteLayer.redraw();
 	});
 	$("#searchText").click(function () {
@@ -432,12 +438,10 @@ $(document).ready(function () {
 			}
 		}
 	});
-
 	// Fix login input element click problem
 	$('.dropdown input, .dropdown label').click(function (e) {
 		e.stopPropagation();
 	});
-//console.log('Map.js ready stop')
 }); //end document ready
 function apply_filter () {
 	if ($('#select_sites').val() == "WQP") {
@@ -475,27 +479,9 @@ function apply_filter () {
 		ty = ''
 	}
 	filt = filt + wsaq + ty
-	//var aq = filter.
-	//for (var prop in filter){
-	//   if (filter[prop] !==null ){
-	//ddif(filt==''){
-	//dd    filt=filter[prop]
-	//dd}else{
-	//       filt = filt + ' OR ' + filter[prop];
-
-	//dd }
-	//   }
-	//}
-	//var filt="Source = '" + $('#select_sites').val() + "' AND ( huc_4 ='1106' " + filt.replace("undefined","")  + ")";
 	console.log(filt);
-	//if (filt===''){
-	//    siteLayer.styleMap = siteStyles;
-	//    siteLayer.redraw();
-	//}else{
-	// alert(filt);
 	updateFilter(filt);
 	siteLayer.redraw();
-	//apply_current();
 
 }
 function apply_current () {
@@ -506,7 +492,7 @@ function apply_current () {
 			siteTotal = siteTotal + 1;
 		}
 	});
-	console.log(siteTotal)
+	//console.log(siteTotal)
 	$("#totmsg").html("<table width='100%'><tr><td>Total Sites: <b>" + siteTotal +
 		"</b></td><td style='text-align:right;'><a href='#' class='btn btn-info btn-mini' onclick='window.location.reload();'>Clear Selected</a></td></tr></table>");
 
@@ -535,12 +521,6 @@ function type_filter (div) {
 		temp = temp.replace(')', '');
 		type_filter.push("SiteType ='" + temp + "'");
 	});
-	//var temp = $('#' + div  + ' option:selected').val().replace(/-/g, '');
-	//temp = temp.replace(/\s+/g, '');
-	//temp= temp.replace('(','_')
-	//temp= temp.replace(')','')
-	//var type_filter='';
-	//type_filter=  "SiteType ='" +temp +"'"
 	filter.type = type_filter
 	cfilter.type = '<li >Type: (Click to Remove)<br><a style="margin-left:1px;"  onclick="removeFilter(2);" href="javascript:void(0);">' + $.trim($('#' + div + ' option:selected').text());
 	+"</a></li>"
@@ -549,7 +529,7 @@ function type_filter (div) {
 }
 
 
-function load_sites (layer, url, source, mapping) {
+function load_sites (layer, url, source, mapping,color) {
 	loaded_sources.push(source);
 	var mess = 'Loading.... ' + $('#select_sites option:selected').text()
 	$.blockUI({ message: mess, css: {
@@ -591,47 +571,15 @@ function load_sites (layer, url, source, mapping) {
 			}
 			pointFeature.attributes = {"REF_NO": val[mapping.REF_NO], "Sitename": val[mapping.Sitename], "State": "OK", "Status": val[mapping.Status],
 				"Source": source.replace(/-/g, ''), "SiteType": modtype, 'lat': val[mapping.lat], 'lon': val[mapping.lon],
-				'aquifer': aqui, 'huc_4': huc4, 'huc_8': huc8};
-			//console.log(pointFeature.attributes);
-			//        console.log(pointFeature.attributes);
+				'aquifer': aqui, 'huc_4': huc4, 'huc_8': huc8,'color': color }; //"#5258ba"};
 			layer.addFeatures(pointFeature);
 			sitesActive.push(val[mapping.REF_NO]);
 
 		}); //end each
 		apply_current();
-		//$("#totmsg").html("<table width='100%'><tr><td>Total Sites: <b>" + sitesTotal.length +
-		//	"</b></td><td style='text-align:right;'><a href='#' class='btn btn-info btn-mini' onclick='window.location.reload();'>Clear Selected</a></td></tr></table>");
 		$.unblockUI();
 	}); //end getJSON
 }
-/*
- function addFilter (source) {
- alert(source);
- }
- function display_aquifer () {
- if ($('#show_aquifer').attr('checked') ? true : false) {
- drawLayer.removeAllFeatures();
- $("#idaquifer option:selected").each(function () {
- var url = baseurl + "/mongo/db_find/ows/aquifers/{'spec':{'properties.NAME':'" + $(this).text() + "'}}"
- drawFeature(url);
- });
- //drawAquiferFeature();
- } else {
- drawLayer.removeAllFeatures();
- }
- }
- function display_watershed () {
- if ($('#show_watershed').attr('checked') ? true : false) {
- drawLayer.removeAllFeatures();
- $("#idwatershed option:selected").each(function () {
- var url = baseurl + '/mongo/db_find/ows/watersheds/{"spec":{"properties.HUC":"' + $(this).val() + '"}}'
- drawFeature(url);
- });
- //drawAquiferFeature();
- } else {
- drawLayer.removeAllFeatures();
- }
- }*/
 function updateFilter (fltr) {
 	var filter;
 	try {
@@ -640,56 +588,21 @@ function updateFilter (fltr) {
 		alert(err.message);
 	}
 	if (filter) {
-		//alert("apply filter");
-		//output.value = "";
+		//newRule.filter = filter;
 		rule.filter = filter;
 		siteLayer.redraw();
 	}
 	return false;
 }
-/*
- function drawAquiferFeature(){
- $("#idaquifer option:selected").each(function (){
- var url = baseurl + "/mongo/db_find/ows/aquifers/{'spec':{'properties.NAME':'" + $(this).text() + "'}}"
- drawFeature(url);
- });
- }
- function drawAquiferFeature(){
- $("#idaquifer option:selected").each(function (){
- var url = baseurl + "/mongo/db_find/ows/aquifers/{'spec':{'properties.NAME':'" + $(this).text() + "'}}"
- drawFeature(url);
- });
- }
- $('#idwatershed option').each( function(){ console.log(this.value)});
-
- */
 function removeFeature (property, value) {
 	filterLayer.removeFeatures(filterLayer.getFeaturesByAttribute(property, value))
-	//console.log(drawLayer.getFeatureBy('data.' + property, value))
-	//drawLayer.removeFeatures(drawLayer.getFeatureBy(property, value))
-	/*var feature=null;
-	 $.each(drawLayer.features,function(){
-	 console.log(this.data[property]);
-	 console.log(value);
-	 if(this.data[property]==value){
-	 feature=this;
-	 }
-	 });
-	 console.log(feature)
-	 if(!feature==null){
-	 drawlayer.removeFeatures([feature])
-	 }*/
 }
 function resetFeatures (showFilter) {
 	drawLayer.removeAllFeatures();
-	//showFilter.prop('checked',!showFilter.prop('checked'))
-	//showFilter.prop('checked',!showFilter.prop('checked'))
-
 }
 function showFeature (feature, showFilter) {
 	//console.log('showfilter');
 	console.log(feature);
-	//if (showFilter.attr('checked') ? true : false) {
 	var in_options = {'internalProjection': map.projection, 'externalProjection': map.projection};
 	var geojson_format = new OpenLayers.Format.GeoJSON(in_options);
 	var pre = '{"type": "FeatureCollection","features":'
@@ -699,10 +612,6 @@ function showFeature (feature, showFilter) {
 		features = [features];
 	}
 	filterLayer.addFeatures(features);
-
-	//} else {
-	//    filterLayer.removeAllFeatures();
-	//}
 }
 function drawFeature (url) {
 	var in_options = {'internalProjection': map.projection, 'externalProjection': map.projection};
@@ -716,17 +625,6 @@ function drawFeature (url) {
 			features = [features];
 		}
 		drawLayer.addFeatures(features);
-		/*
-		 watershed = $('#idwatershed option:selected').val();
-		 var info =[];
-		 $.each(drawLayer.features, function(key,f) {
-		 $.each(siteLayer.features, function(key,val) {
-		 if(val.geometry.intersects(f.geometry)) {
-		 info.push(val.attributes.REF_NO)
-		 }
-		 });
-		 });
-		 console.log(JSON.stringify({'HUC':watershed,'sites':info}));*/
 	});
 
 }
@@ -775,52 +673,45 @@ function onPopupClose (evt) {
 	}
 }
 function onFeatureSelectNav (evt) {
+	if(evt_bool==true){
 	feature = evt.feature;
 	//new OpenLayers.Size(600,200)  feature.geometry.getBounds().getCenterLonLat()
 	content = "<b>" + feature.attributes.Sitename + "</b><table class='table-condensed' style='margin-bottom:5px;margin-right:10px;'>" +
 		"<tr><th>ID</th><td>" + feature.attributes.REF_NO + "</td></tr>" +
 		"<tr><th>Type</th><td>" + feature.attributes.SiteType + "</td></tr>" +
 		"<tr><th>Status</th><td>" + feature.attributes.Status + "</td></tr>" +
-		"<tr><td colspan='2'><a style='color:blue;' href='#' onclick='showbib(" + '"' + feature.attributes.REF_NO + '"' + ")'>Data Access</a></td></tr>" +
+		"<tr><td colspan='2'><a style='color:blue;' href='#' onclick='showbib(" + '"' + feature.attributes.REF_NO + '"' +',"' + feature.attributes.Source + '"' + ")'>Data Access</a></td></tr>" +
 		"<tr><td colspan='2'><a style='color:blue;' href='http://maps.google.com/maps?z=15&t=k&q=loc:" + feature.attributes.lat + "," + feature.attributes.lon +
 		"' target='_blank'>Google Maps</a></td></tr></table>"
+        //new OpenLayers.Size(100, 100)
 	popup = new OpenLayers.Popup.FramedCloud("featurePopup", feature.geometry.getBounds().getCenterLonLat(), new OpenLayers.Size(100, 100),
 		content, null, true, onPopupClose);
 	popup.panMapIfOutOfView = true;
-
-	// popup.calculateRelativePosition = function () {
-	//     return 'tr';
-	// }
-	popup.autoSize = true;
 	feature.popup = popup;
 	popup.feature = feature;
-	mypop = popup;
 	map.addPopup(popup, true);
-
-	//var id = (feature.attributes.loc_id) ? feature.attributes.loc_id : '';
-	//$("#mapinfo").html("<input type='hidden' id='sitesel' value='" + id + "'>" + id + " - " + feature.attributes.loc_name );
+	}
 }
 function onFeatureUnselect (evt) {
-	feature = evt.feature;
-	if (feature.popup) {
-		popup.feature = null;
-		map.removePopup(feature.popup);
-		feature.popup.destroy();
-		feature.popup = null;
+	if(evt_bool==true){
+		feature = evt.feature;
+		if (feature.popup) {
+			popup.feature = null;
+			map.removePopup(feature.popup);
+			feature.popup.destroy();
+			feature.popup = null;
+		}
 	}
 }
 
 function onFeatureSelect (feature) {
 	fff = feature
-	//map.div.style.cursor='wait';
-	//setcursor();
-	//setTimeout("document.body.style.cursor = 'wait'", 1);
 	if (feature.getVisibility()) {
 		if (jQuery.inArray(feature.attributes.REF_NO, sitesSel) < 0) {
 			sitesSel.push(feature.attributes.REF_NO);
 			$("#sites tbody").append("<tr>" +
 				"<td>" + feature.attributes.REF_NO + "</td>" +
-				"<td><a style='color:#08C;' href='#' onclick='showbib(" + '"' + feature.attributes.REF_NO + '"' + ");'>" + feature.attributes.Sitename + "</a></td>" +
+				"<td><a style='color:#08C;' href='#' onclick='showbib(" + '"' + feature.attributes.REF_NO + '","' + feature.attributes.Source + '"' + ");'>" + feature.attributes.Sitename + "</a></td>" +
 				"<td style='text-align:center;'>" + feature.attributes.Status + "</td>" +
 				"<td style='text-align:right;'>" + feature.attributes.Source + "</td>" +
 				"<td style='text-align:right;'>" + feature.attributes.SiteType + "</td>" +
@@ -831,9 +722,6 @@ function onFeatureSelect (feature) {
 		}
 		drawLayer.removeAllFeatures();
 	}
-	//setTimeout("document.body.style.cursor = 'auto'", 1);
-	//setcursor();
-	// map.div.style.cursor='wait';
 }
 function executeFunctionWithCursor () {
 	document.body.style.cursor = "wait";
@@ -841,28 +729,15 @@ function executeFunctionWithCursor () {
 	setTimeout("doAdvSearch()", 1);
 	setTimeout("document.body.style.cursor = 'auto';map.div.style.cursor='default';", 1);
 }
-function showbib (ref_no) {
-	var source = $('#select_sites').val().split("_");
+function showbib (ref_no,source) {
+	//var source = $('#select_sites').val().split("_");
 	if ($("#bibAll" + ref_no).length < 1) {
 		$("body").append('<div id="bibAll' + ref_no + '"></div>');
 		$("#bibAll" + ref_no).dialog({ height: 'auto', width: '900px', position: [300, 100], title: "<h3>Data</h3>", close: function () {
 			$("#bibAll" + ref_no).remove();
 		} });
-		//$("#bibAll"+ref_no).append('<iframe id="iframe'+ref_no+'" src="http://waterdata.usgs.gov/nwis/inventory?agency_code=USGS&site_no='+ref_no+'" width="100%" height="700"></iframe>');
-		//$("#bibAll"+ref_no).load("/tools/usgs_metadata/"+ref_no);
-		//$("#bibAll"+ref_no).append('<div data-fragment="/tools/usgs_metadata/'+ref_no+'"</div>');
-		//fragment.render();
-		if ($('#select_sites').val() == 'MESONET') {
-			$("#bibAll" + ref_no).append('<iframe id="iframe' + ref_no + '" src="/tools/usgs_metadata/' + ref_no + '?source=MESONET" width="100%" height="700"></iframe>');
-		} else if (source[0] == 'OWRB') {
-			$("#bibAll" + ref_no).append('<iframe id="iframe' + ref_no + '" src="/tools/usgs_metadata/' + ref_no + '?source=OWRB" width="100%" height="700"></iframe>');
-		} else if ($('#select_sites').val() == 'OWRBMW') {
-			$("#bibAll" + ref_no).append('<iframe id="iframe' + ref_no + '" src="/tools/usgs_metadata/' + ref_no + '?source=OWRBMW" width="100%" height="700"></iframe>');
-		} else if ($('#select_sites').val() == 'WQP') {
-			$("#bibAll" + ref_no).append('<iframe id="iframe' + ref_no + '" src="/tools/usgs_metadata/' + ref_no + '?source=WQP" width="100%" height="700"></iframe>');
-		}else {
-			$("#bibAll" + ref_no).append('<iframe id="iframe' + ref_no + '" src="/tools/usgs_metadata/' + ref_no + '" width="100%" height="700"></iframe>');
-		}
+		var srce = source.split("_")[0]
+		$("#bibAll" + ref_no).append('<iframe id="iframe' + ref_no + '" src="/tools/usgs_metadata/' + ref_no + '?source=' + srce + '" width="100%" height="700"></iframe>');
 	}
 }
 function setcursor () {
@@ -1273,12 +1148,6 @@ function download_post (data_format, data_query) {
 	var data = { format: data_format, query: querys}
 	form_post(url, data);
 }
-//function download_post_data(data_format,data_query){
-//    var url = 'http://test.cybercommons.org/tools/get_datafile/';
-//    var querys = '{"spec":{"label":{"$in":['+saveselsites[parseInt(data_query)]+']}}}';
-//    var data ={ format:data_format,query:querys}
-//    form_post(url,data);
-//}
 function form_post (url, data) {
 	var form = document.createElement("form");
 	form.setAttribute("method", "post");
@@ -1295,22 +1164,6 @@ function form_post (url, data) {
 	document.body.appendChild(form);
 	form.submit();
 }
-/*
- function searchState (sstates) {
- unHighlightAll();
- var sstates = sstates.join();
- $.each(siteLayer.features, function(key,val) {
- $.each(val.attributes.State, function(key2,val2) {
- val2='"'+val2+'"';
- if (sstates.indexOf(val2) > -1) {
- onFeatureSelect(val)
- selectControls.select.highlight(val);
- }
- });
- });
-
- }
- */
 function searchText (txtsrch) {
 	unHighlightAll();
 	if (IsNumeric(txtsrch)) {
