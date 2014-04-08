@@ -204,20 +204,38 @@ function load_well_log_sites () {
 function load_dash () {
 	var url = baseurl + "/catalog/db_find/ows/data/{'spec':{'data_provider':'Watersheds'}}"
 	var i = 0;
+
+
+//load date range
+Date.prototype.yyyymmdd = function() {         
+                                
+        var yyyy = this.getFullYear().toString();                                    
+        var mm = (this.getMonth()+1).toString(); // getMonth() is zero-based         
+        var dd  = this.getDate().toString();             
+                            
+        return yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' + (dd[1]?dd:"0"+dd[0]);
+   };  
+
+d = new Date();
+var myDate=new Date();
+myDate.setDate(myDate.getDate()-14);
+var todayDate = d.yyyymmdd();
+var agoDate = myDate.yyyymmdd();
+
 	$.getJSON(url, function (fdata) {
 		try {
 			$.each(fdata[0], function (key, val) {
 				i = i + 1;
 				subs = ''
 				$.each(val.subs, function (skey, sval) {
-					subs = subs + '<li><a href="/dashboard/watershed.html?huc=' + skey + '&day=14" target="_blank">' + sval + '</a></li>'
+					subs = subs + '<li><a class="basic" href="/dashboard/watershed.html?huc=' + skey + '&start=' + agoDate + '&end=' + todayDate +'" rel="/dashboard/images/wsimg/' + skey + '.jpg" title="' + sval + ' | HUC ' + skey + '" target="_blank">' + sval + '</a></li>'
 				});
 				if (i < 6) {
 					$("#waterdash").append('<li>' + val.name + '<ul>' + subs + '</ul></li>');
 				} else if (i < 10) {
 					$("#waterdash2").append('<li>' + val.name + '<ul>' + subs + '</ul></li>');
 				} else {
-					$("#waterdash3").append('<li>' + val.name + '<ul>' + subs + '</ul></li>');
+					$("#waterdash3").append('<script src = "/dashboard/cluetip/jquery.cluetip.js"></script><script src="/dashboard/cluetip/lib/jquery.hoverIntent.js"></script><script src="/dashboard/cluetip/demo/demo.js"></script><link rel="stylesheet" href="/dashboard/cluetip/jquery.cluetip.css" type="text/css" /><li>' + val.name + '<ul>' + subs + '</ul></li>');
 				}
 			});
 
