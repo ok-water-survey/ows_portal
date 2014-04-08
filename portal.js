@@ -56,6 +56,9 @@ $(function () {
 	//simpleCart.bind( 'error' , function(message){
     //    alert( message );
 	//});
+	//$(".cartInfo").click(function(){
+	//	$("#cartPopover").offset({ left: $(document).width() - 421, top: window.scrollY + 65});
+	//});
 
 	$("#header .cartInfo").toggle(function () {
 		$('.item-query').hide();
@@ -76,9 +79,11 @@ $(function () {
 		$(".item-query").hide();
 	});
 	$(window).scroll(function () {
+
 		$("#cartPopover").offset({ left: $(document).width() - 421, top: window.scrollY + 65});
 	});
 	$(window).resize(function () {
+
 		$("#cartPopover").offset({ left: $(document).width() - 421, top: window.scrollY + 65});
 	});
 	$('#select_sites').change(function () {

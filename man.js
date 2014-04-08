@@ -4,35 +4,70 @@
 	Views: {},
 	Templates: {}
 }
+var filter_source_parent={};
 var setFilter = {
-	set: function(){
-	if (filter.source !== null){
-		filt = 	'(' + filter.source.join(' OR ') + ')'
-	}else{
-		//Set crazy source to let filter work and return None
-		filt = "(Source = 'null_code')"
-	}
-	var wsaq = '';//'',aq='',ty='';
-	if (filter.watershed !== null && filter.aquifer !== null) {
-		wsaq = filter.watershed.concat(filter.aquifer);
-		wsaq = ' AND (' + wsaq.join(' OR ') + ')'
-	} else {
-		if (filter.watershed !== null) {
-			wsaq = ' AND (' + filter.watershed.join(' OR ') + ')'
+	set: function () {
+		if (filter.source ==[]){
+			filter.source=null;
 		}
-		if (filter.aquifer !== null) {
-			wsaq = ' AND (' + filter.aquifer.join(' OR ') + ')';
+		if (filter.source !== null ) {
+			var slist =[]
+			$.each(filter.source, function(key,value){
+				console.log(key);
+				console.log(value);
+				var temp = value.replace("Source = '",''); ///\s+/g, '');
+				temp = temp.replace("'",'');
+				//temp = temp.replace(/Source=/g,'');
+				//temp = temp.replace(/'/g,'') + '_type';
+				console.log(temp)
+				temp = filter_source_parent[temp]
+				temp = temp + '_type';
+				console.log(temp)
+				if (filter[temp] !== undefined && filter[temp] !== null){
+					if (filter[temp].length == 0 ){//join(' OR ') == '' ){
+						slist.push('(' + value + ')')
+					}else{
+						slist.push('(' + value + ' AND (' + filter[temp].join(' OR ') + ')' + ')')
+					}
+				}else{
+					slist.push('(' + value + ')')
+				}
+			});
+			filt = '(' + slist.join(' OR ') + ')'
+			//filt = filt.replace(/AND ()/g,'');
+		} else {
+			//Set crazy source to let filter work and return None
+			filt = "(Source = 'null_code')"
 		}
-	}
-	if (filter.type !== null) {
-		ty = ' AND (' + filter.type.join(' OR ') + ')'
-	} else {
-		ty = ''
-	}
-	filt = filt + wsaq + ty
-	console.log(filt);
-	updateFilter(filt);
-	siteLayer.redraw();
+		var wsaq = '';//'',aq='',ty='';
+		var wsaq1 ='';
+		if (filter.watershed !== null && filter.aquifer !== null) {
+			wsaq1 = filter.aquifer
+			wsaq = filter.watershed.concat(filter.aquifer);
+			wsaq = ' (' + wsaq.join(' OR ') + ')'
+			wsaq1 = '(' + wsaq1.join(' OR ') + ')'
+			wsaq1 = wsaq1.replace(/aquifer/g,'aquifers')
+			wsaq = ' AND (' + wsaq + ' OR ' + wsaq1 + ')'
+			//console.log(wsaq)
+		} else {
+			if (filter.watershed !== null) {
+				wsaq = ' AND (' + filter.watershed.join(' OR ') + ')'
+			}
+			if (filter.aquifer !== null) {
+				wsaq = ' (' + filter.aquifer.join(' OR ') + ')';
+				wsaq1 = wsaq.replace(/aquifer/g,'aquifers')
+				wsaq = ' AND (' + wsaq + ' OR ' + wsaq1 + ')'
+			}
+		}
+		//if (filter.type !== null) {
+		//	ty = ' AND (' + filter.type.join(' OR ') + ')'
+		//} else {
+		//	ty = ''
+		//}
+		filt = filt + wsaq // + ty
+		console.log(filt);
+		updateFilter(filt);
+		siteLayer.redraw();
 	}
 }
 //****** Template Manager *************
@@ -98,7 +133,7 @@ MVC.Models.Watershed = Backbone.Model.extend({})
 MVC.Models.Aquifer = Backbone.Model.extend({})
 MVC.Models.Data_filter = Backbone.Model.extend({})
 MVC.Models.WQP = Backbone.Model.extend({})
-MVC.Models.my_types =Backbone.Model.extend({})
+MVC.Models.my_types = Backbone.Model.extend({})
 
 //****** Collections ******************
 
@@ -124,23 +159,23 @@ MVC.Collections.WQPS = Backbone.Collection.extend({
 	comparator: 'OrganizationFormalName'
 });
 MVC.Collections.my_types = Backbone.Collection.extend({
-	initialize: function(models,options){
-		this.url="";
+	initialize: function (models, options) {
+		this.url = "";
 	}
 });
 //****** Views ************************
 
 //Source Views
 MVC.Views.Sources = Backbone.View.extend({
-	el:$('#datasource'),
+	el: $('#datasource'),
 	template: "Watershed_base",
-	initialize: function() {
+	initialize: function () {
 		this.template = TemplateManager.get(this.template);
 		this.render();
 		this.collection.bind("reset", this.render, this);
 		this.collection.bind("add", this.addOne, this);
 	},
-	render: function(){
+	render: function () {
 		$(this.el).html(this.template())
 	},
 	addAll: function () {
@@ -225,6 +260,8 @@ MVC.Views.sourceFilters = Backbone.View.extend({
 		$('#mesonet_type').html(this.template());
 		$('#owrb_type').html(this.template());
 		$('#owrbmw_type').html(this.template());
+		$('#wqp_type').html(this.template());
+		$('#owrbmww_type').html(this.template());
 		//add next
 		//this.addAll();
 	},
@@ -248,7 +285,7 @@ MVC.Views.Source = Backbone.View.extend({
 		'<ul id="menu1" class="dropdown-menu" role="menu" aria-labelledby="drop4"><li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li></ul>',
 	undomenu1: '<div class="btn-group"><button class="btn btn-default btn-mini dropdown-toggle" style="margin-left:18px;" type="button" data-toggle="dropdown"><span class="icon-filter"></span>Filter &nbsp;<b class="caret"></b></button><ul class="dropdown-menu"></ul></div>',
 	undoitem: '<li id="my_id_li" class="my_class_pli my_type"><span><i class="icon-remove-circle" rel="tooltip" title="my_full_name" id="blah"></i><a style="color:my_color;" class="my_id_li_clk" style="display:inline-block">my_name</a></span>undo_menu</li>',
-	undomenu: '<div class="btn-group"> <button class="btn btn-default btn-mini" id="btn_id_btnid"style="margin-left:18px;" type="button"><span class="icon-filter"></span>Filter &nbsp;</button></div>',
+	undomenu: '<div class="btn-group myfilts" style="margin-left:18px;"> <button class="btn btn-default btn-small my-btn-mini" id="btn_id_btnid" type="button"><span class="icon-filter"></span>Data Source Filters</button><div class="div_types" id="my_source_undo"></div></div>',
 	initialize: function () {
 		//Initialize Backbone js temple
 		this.template = TemplateManager.get(this.template);
@@ -257,10 +294,10 @@ MVC.Views.Source = Backbone.View.extend({
 		//////////this.model.bind('destroy', this.destroyItem, this);
 		//this.model.bind('remove', this.removeItem, this);
 	},
-	afterRender: function(){
+	afterRender: function () {
 		var $addFilterdata = this.model.toJSON();
 		//Hide subs
-		if('parent' in $addFilterdata){
+		if ('parent' in $addFilterdata) {
 			$('.' + $addFilterdata.parent).hide();
 		}
 	},
@@ -268,25 +305,27 @@ MVC.Views.Source = Backbone.View.extend({
 		var $addFilterdata = this.model.toJSON(); //data
 		//Get color
 		var $color = "#5258ba" //Default Color
-		if("color" in $addFilterdata){
+		if ("color" in $addFilterdata) {
 			$color = $addFilterdata.color
 		}
 		//set filter
 		var $filt;
-		$filt =  "Source = '" +  $addFilterdata.value + "'";
+		$filt = "Source = '" + $addFilterdata.value + "'";
 		//console.log($addFilterdata.sub)
-		if ($addFilterdata.sub == true ) {
+		if ($addFilterdata.sub == true) {
 			//$addFilterdata.name = ' - ' + $addFilterdata.name;
 			//Set undo item in list then hide
 			this.undoitem = this.undoitem.replace(/my_id/g, $addFilterdata.value);
 			this.undoitem = this.undoitem.replace(/my_name/g, '&nbsp;' + $addFilterdata.name.split('(')[0]);
-			this.undoitem = this.undoitem.replace(/my_full_name/g, '&nbsp;' +  $addFilterdata.name);
-			this.undoitem = this.undoitem.replace(/undo_menu/g,'')
-			this.undoitem = this.undoitem.replace(/my_type/g,'undo_sub')
-			this.undoitem = this.undoitem.replace(/my_class/g,$addFilterdata.parent + 'ct')
+			this.undoitem = this.undoitem.replace(/my_full_name/g, '&nbsp;' + $addFilterdata.name);
+			this.undoitem = this.undoitem.replace(/undo_menu/g, '')
+			this.undoitem = this.undoitem.replace(/my_type/g, 'undo_sub')
+			this.undoitem = this.undoitem.replace(/my_class/g, $addFilterdata.parent + 'ct')
 			$addFilterdata.name = '&nbsp;&nbsp;' + $addFilterdata.name.split('(')[0];
+			this.undoitem = this.undoitem.replace(/my_source/g,'');
 			//$addFilterdata.name = $addFilterdata.name.split('(')[0];
 			//Set template
+			filter_source_parent[$addFilterdata.value] = $addFilterdata.parent
 			//console.log(this.sub_template($addFilterdata))
 			$(this.el).append(this.sub_template($addFilterdata));
 			//$filt = "huc_8 = '" + $addFilterdata.huc_id + "'";
@@ -299,15 +338,17 @@ MVC.Views.Source = Backbone.View.extend({
 			this.undoitem = this.undoitem.replace(/my_id/g, $addFilterdata.value);
 			this.undoitem = this.undoitem.replace(/my_name/g, $addFilterdata.name.split('(')[0]);
 			this.undoitem = this.undoitem.replace(/my_full_name/g, $addFilterdata.name);
-			this.undoitem = this.undoitem.replace(/undo_menu/g,this.undomenu)
-			this.undoitem = this.undoitem.replace(/my_class/g,$addFilterdata.value)
-			this.undoitem = this.undoitem.replace(/my_type/g,'undo_main')
+			this.undoitem = this.undoitem.replace(/undo_menu/g, this.undomenu)
+			this.undoitem = this.undoitem.replace(/my_class/g, $addFilterdata.value)
+			this.undoitem = this.undoitem.replace(/my_type/g, 'undo_main')
+			this.undoitem = this.undoitem.replace(/my_source/g, $addFilterdata.value);
 			//set divider
 			//this.undoitem = this.undoitem + '<li class="divider"></li>'
 			//$filt = "huc_4 = '" + $addFilterdata.huc_id + "'";
+			filter_source_parent[$addFilterdata.value] = $addFilterdata.value
 		}
 		//Set link Color
-		this.undoitem = this.undoitem.replace(/my_color/g,$color)
+		this.undoitem = this.undoitem.replace(/my_color/g, $color)
 		this.undoitem = this.undoitem.replace(/btn_id/g, $addFilterdata.value)
 
 		//Set undo item in list then hide
@@ -318,18 +359,18 @@ MVC.Views.Source = Backbone.View.extend({
 		$undolist.append(this.undoitem);
 		//$undolist.append(this.undomenu);
 		var $undoitm = $('#' + $addFilterdata.value + '_li')
-		$undoitm.find("ul").append('<li><a href="#">Action</a></li>')
+		//$undoitm.find("ul").append('<li><a href="#">Action</a></li>')
 		var $undoitmclick = $('.' + $addFilterdata.value + '_li_clk')
 		var $visible = false;
 
 		//set Default page open datasets - USGS Active Sites as visible
-		if ($addFilterdata.value == "USGS"){
-			filter.source=[]
+		if ($addFilterdata.value == "USGS") {
+			filter.source = []
 			//Load data
 			filter.source.push("Source = '" + $addFilterdata.value + "'")
 			//load_sites (siteLayer, $addFilterdata.url,$addFilterdata.value ,$addFilterdata.mapping)
 			$visible = true;
-		}else{
+		} else {
 			$undoitm.hide();
 		}
 		//Hide subs
@@ -345,14 +386,21 @@ MVC.Views.Source = Backbone.View.extend({
 		//Click event handler
 		$addFilterAction.click(function () {
 			//console.log($addFilterdata.hassubs);
-			if ( $addFilterdata.hassubs ){
-				if ($('.' + $addFilterdata.value).is(':visible')){
+			if ($addFilterdata.hassubs) {
+				if ($('.' + $addFilterdata.value).is(':visible')) {
 					$('.' + $addFilterdata.value).hide();
-				}else{
+				} else {
 					$('.' + $addFilterdata.value).show();
 				}
 				//console.log('.' + $addFilterdata.value)
-			}else{
+			} else {
+				if ($addFilterdata.sub){
+					var subparent = $('#' + $addFilterdata.parent + '_li');
+					if(subparent.is(':hidden')){
+						$visible = false;
+
+					}
+				}
 				if (!$visible) {
 					//console.log($addFilterdata.huc_id);
 					if (filter.source == null) {
@@ -362,14 +410,15 @@ MVC.Views.Source = Backbone.View.extend({
 					filter.source = _.uniq(filter.source, JSON.stringify);
 					if ($.inArray($addFilterdata.value, loaded_sources) > -1) {
 						setFilter.set()
-					}else{
+					} else {
 						loaded_sources.push($addFilterdata.value)
-						if("color" in $addFilterdata){
-							color=$addFilterdata.color
-						}else{
-							color="#5258ba"
+						if ("color" in $addFilterdata) {
+							color = $addFilterdata.color
+						} else {
+							color = "#5258ba"
 						}
-						load_sites (siteLayer, $addFilterdata.url,$addFilterdata.value ,$addFilterdata.mapping,color)
+						load_sites(siteLayer, $addFilterdata.url, $addFilterdata.value, $addFilterdata.mapping, color)
+						filter[$addFilterdata.value + '_type']=[];
 						setFilter.set()
 					}
 					//Set the visible site total
@@ -379,9 +428,9 @@ MVC.Views.Source = Backbone.View.extend({
 					$undolist.show();
 					$undoitm.show();
 					$visible = true;
-					if ($addFilterdata.sub){
+					if ($addFilterdata.sub) {
 						$('.' + $addFilterdata.parent + '_pli').show()
-						$('.' + $addFilterdata.parent + '_pli .icon-remove-circle').hide()
+						//$('.' + $addFilterdata.parent + '_pli .icon-remove-circle').hide()
 					}
 
 					//resetFeatures($showFilter)
@@ -391,7 +440,6 @@ MVC.Views.Source = Backbone.View.extend({
 					//showFeature($fdata, $showFilter);
 				}
 			}
-
 		});
 		$undoitm.mouseover(function () {
 			try {
@@ -413,30 +461,45 @@ MVC.Views.Source = Backbone.View.extend({
 		});
 
 		$undoitmclick.click(function () {
-
-			if ($('#sourceFilt > li:visible').length == 1) {
-				//console.log(filter.source);
-				filter.source = null;
-				//console.log(filter.source);
-				$undolist.hide()
-			} else {
-				var index = filter.source.indexOf($filt);
-				filter.source.splice(index, 1);
-			};
-			if ($('.' + $addFilterdata.parent + 'ct_pli:visible').length==1){
-				$('.' + $addFilterdata.parent + '_pli').hide()
-				console.log($addFilterdata.parent)
-			}
-			$undoitm.hide();
-			setFilter.set();
-			apply_current()
-			//apply_filter();
-			$visible = false;
-			//removeFeature('HUC', $addFilterdata.huc_id)
+			//console.log($('.' + $addFilterdata.parent + 'ct_pli:visible').length)
+			//if ($addFilterdata.hassubs && $('.' + $addFilterdata.parent + 'ct_pli:visible').length > 0) {
+			//	console.log('Nothing');
+			//} else {
+				if ($('#sourceFilt > li:visible').length == 1) {
+					//console.log(filter.source);
+					filter.source = null;
+					//console.log(filter.source);
+					$undolist.hide()
+				} else {
+					var index = filter.source.indexOf($filt);
+					filter.source.splice(index, 1);
+				}
+				;
+				if ($('.' + $addFilterdata.parent + 'ct_pli:visible').length == 1) {
+					$('.' + $addFilterdata.parent + '_pli').hide()
+					console.log($addFilterdata.parent)
+				}
+				//console.log($addFilterdata.hassubs)
+				//console.log($addFilterdata.parent)
+				if ($addFilterdata.hassubs){
+					$('.' + $addFilterdata.value + 'ct_pli').hide();
+				}
+				$undoitm.hide();
+				setFilter.set();
+				apply_current()
+				//apply_filter();
+				$visible = false;
+				//removeFeature('HUC', $addFilterdata.huc_id)
+			//}
 
 		});
-		$filterButton.click(function(){
+		$filterButton.click(function () {
 			console.log($addFilterdata.value)
+			$('.TYPE_FILTER').hide();
+			$('.' + $addFilterdata.value).show();
+			$("#dialog-filter")
+				.dialog('option','title', "<b>" + $addFilterdata.name + " Filter</b>")
+				.dialog('open');
 		});
 		//$undoitmclick.click(function(){
 		//	alert('hi');
@@ -445,7 +508,6 @@ MVC.Views.Source = Backbone.View.extend({
 		return $(this.el);
 	}
 })
-
 
 
 MVC.Views.Watershed = Backbone.View.extend({
@@ -505,6 +567,7 @@ MVC.Views.Watershed = Backbone.View.extend({
 				filter.watershed = _.uniq(filter.watershed, JSON.stringify);
 				//apply_filter();
 				setFilter.set()
+				apply_current()
 				//Show close li on
 				$undolist.show();
 				$undoitm.show();
@@ -514,6 +577,9 @@ MVC.Views.Watershed = Backbone.View.extend({
 					$fdata = GeojsonManager.get($addFilterdata.huc_id, 'Watershed');
 				}
 				showFeature($fdata, $showFilter);
+			}else{
+
+				$undoitm.trigger( "click" );
 			}
 		});
 		$undoitm.mouseover(function () {
@@ -547,6 +613,7 @@ MVC.Views.Watershed = Backbone.View.extend({
 			$undoitm.hide();
 			//apply_filter();
 			setFilter.set();
+			apply_current()
 			$visible = false;
 			removeFeature('HUC', $addFilterdata.huc_id)
 
@@ -623,6 +690,7 @@ MVC.Views.Aquifer = Backbone.View.extend({
 				filter.aquifer = _.uniq(filter.aquifer, JSON.stringify);
 				//apply_filter();
 				setFilter.set();
+				apply_current()
 				//Show close li on
 				$undolist.show();
 				$undoitm.show();
@@ -631,6 +699,8 @@ MVC.Views.Aquifer = Backbone.View.extend({
 					$fdata = GeojsonManager.get($addFilterdata.org_name, 'aquifer');
 				}
 				showFeature($fdata, $showFilter);
+			}else{
+				$undoitm.trigger( "click" );
 			}
 		});
 		$undoitm.mouseover(function () {
@@ -657,6 +727,7 @@ MVC.Views.Aquifer = Backbone.View.extend({
 			$undoitm.hide();
 			//apply_filter();
 			setFilter.set();
+			apply_current()
 			$visible = false;
 			removeFeature('NAME', $addFilterdata.org_name)
 		});
@@ -671,7 +742,7 @@ MVC.Views.sourceFilter = Backbone.View.extend({
 	tagName: "li",
 	template: "Aquifer_detail",
 	undolist: $("#currentFilt_type"),
-	undoitem: '<li id="my_id_li"><img src="x.png" alt="Remove"><a style="display:inline-block">my_name</a></li>',
+	undoitem: '<li id="my_id_li"><span><i class="icon-remove-circle" rel="tooltip" title="Remove Type" id="blah"></i><a style="color:my_color;">my_name</a></span></li>',
 	initialize: function () {
 		//Initialize Backbone js temple
 		this.template = TemplateManager.get(this.template)
@@ -694,37 +765,50 @@ MVC.Views.sourceFilter = Backbone.View.extend({
 		var $addFilterAction = this.$('.add_filter');
 		this.undoitem = this.undoitem.replace(/my_id/g, 'type_' + $addFilterdata.class + $addFilterdata.order.toString());
 		this.undoitem = this.undoitem.replace(/my_name/g, $addFilterdata.name);
-		var $undolist = this.undolist
+		this.undoitem = this.undoitem.replace(/my_color/g, $addFilterdata.color);
+		var $undolist = $("#" + $addFilterdata.source + "_undo") //***this.undolist
+		var $undolist_string = "#" + $addFilterdata.source + "_undo"
 		$undolist.append(this.undoitem);
 		var $undoitm = $('#type_' + $addFilterdata.class + $addFilterdata.order.toString() + '_li').hide();
 		var $visible = false;
-		var $sites = $('#select_sites');
-		$sites.change(function () {
-			filter.type = null;
-			$undolist.hide()
-			$undoitm.hide();
-			$visible = false;
+		//var $sites = $('#select_sites');
+		//$sites.change(function () {
+		//	filter.type = null;
+		//	$undolist.hide()
+		//	$undoitm.hide();
+		//	$visible = false;
 			//alert('this has fired');
-		});
+		//	});
+		var $filt_list =$addFilterdata.source + '_type'
 		$addFilterAction.click(function () {
+
 			if (!$visible) {
 				console.log($addFilterdata.name);
-				if (filter.type == null) {
-					filter.type = [];
+				if (filter[$filt_list] == null) {
+					filter[$filt_list] = [];
 				}
-				filter.type.push($filt);
-				filter.type = _.uniq(filter.type, JSON.stringify);
+				filter[$filt_list].push($filt);
+				filter[$filt_list] = _.uniq(filter[$filt_list], JSON.stringify);
 				//apply_filter();
 				setFilter.set();
 				//Show close li on
 				$undolist.show();
 				$undoitm.show();
 				$visible = true;
+			} else{
+				//var subparent = $('#' + $addFilterdata.source + '_li')
+				//console.log(subparent)
+				//if(subparent.is(':hidden')){
+				//	subparent.show()
+				//}
+				$undoitm.trigger( "click" );
+				$undolist.show();
 			}
+			apply_current()
 		});
 		$undoitm.mouseover(function () {
-			window.evt_bool=false;
-			$.each(siteLayer.getFeaturesByAttribute('SiteType', $org_filt) , function (idx, val) {
+			window.evt_bool = false;
+			$.each(siteLayer.getFeaturesByAttribute('SiteType', $org_filt), function (idx, val) {
 				selectFeature.select(val);
 			});
 		});
@@ -732,20 +816,21 @@ MVC.Views.sourceFilter = Backbone.View.extend({
 			$.each(siteLayer.getFeaturesByAttribute('SiteType', $org_filt), function (idx, val) {
 				selectFeature.unselect(val);
 			});
-			window.evt_bool=true;
+			window.evt_bool = true;
 		});
 		$undoitm.click(function () {
-			if ($('#currentFilt_type > li:visible').length == 1) {
-				filter.type = null;
+			if ($($undolist_string + ' > li:visible').length == 1) {
+				filter[$filt_list] = null;
 				$undolist.hide()
 			} else {
-				var index = filter.type.indexOf($filt);
-				filter.type.splice(index, 1);
+				var index = filter[$filt_list].indexOf($filt);
+				filter[$filt_list].splice(index, 1);
 			}
 			;
 			$undoitm.hide();
 			//apply_filter();
 			setFilter.set();
+			apply_current()
 			$visible = false;
 		});
 		return {position: $addFilterdata.class, template: $(this.el)} //$(this.el).append(this.template(this.model.toJSON())) ;

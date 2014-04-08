@@ -76,7 +76,7 @@ function calltask (taskdesc) {
 			$(options1.status).removeClass('label label-success label-warning label-important').addClass('label label-success');
 			$(options1.status).html('<a href="' + data.tombstone[0].result + '">Download</a>');
 			$(options1.spinner).hide();
-			//simpleCart.empty();
+			simpleCart.empty();
 			//siteLayer.styleMap = myStyles1;
 			//siteLayer.redraw();
 		}

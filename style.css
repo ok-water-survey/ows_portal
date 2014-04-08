@@ -27,6 +27,7 @@
     opacity: 1;
     z-index: 800;
 }
+
 .add_filter {
     white-space: nowrap;
     overflow: hidden;
@@ -41,6 +42,37 @@ div#featurePopup img {
     margin-right: 15px;
 }
 /* MVC style inclusion */
+.my-btn-mini{
+    margin-left: 5px;
+    margin-bottom: 3px;
+}
+.div_types{
+    clear:both;
+    margin-left:10px;
+    margin-right:10px;
+}
+.myfilts {
+    border:2px solid #a1a1a1;
+    padding:5px 10px;
+    background:#dddddd;
+    border-radius:15px;
+    /*min-height: 36px;*/
+}
+.my-nav-btn1{
+    width:30%;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.my-nav-btn2{
+    width:40%;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.my-nav-btn3{
+    width:30%;
+    white-space: nowrap;
+    overflow: hidden;
+}
 .undo_main{
     margin-top: 5px;
     margin-bottom: 5px;
@@ -49,7 +81,7 @@ div#featurePopup img {
     margin-left: 18px;
 }
 .filter-dim {
-    height: 300px;
+    /*height: 300px;*/
     overflow: auto;
 }
 div#currentSource ul {
@@ -81,16 +113,18 @@ div#currentSource ul {
     margin: 0 0 0 6px;
 }
 #currentSource {
-    max-height: 300px;
+    min-height: 300px;
     overflow: auto;
 }
 #datasource {
-    height: 300px;
-    overflow: auto;
+    display:inline;
+    /*height: 300px;
+    overflow: auto;*/
 }
 #watershd {
-    height: 300px;
-    overflow: auto;
+    display: inline;
+    /*height: 300px;
+    overflow: auto;*/
 }
 
 #watershd ul {
@@ -100,8 +134,9 @@ div#currentSource ul {
 }
 
 #aquifers {
-    height: 300px;
-    overflow: auto;
+    display:inline;
+    /*height: 300px;
+    overflow: auto;*/
 }
 
 #aquifers ul {
@@ -157,6 +192,7 @@ div#currentSource ul {
 }
 
 .cartInfo.open {
+    display: block;
     background-position: -218px -26px;
 }
 

@@ -21,7 +21,7 @@ var savflg = 0;
 var qry = '';
 var enqry = '';
 var fff;
-var colorcount =0
+var colorcount = 0
 var stylesColor = {0: "#0000ff", 1: "#b575b5", 2: "#f5914d", 3: "#bd2126", 4: "#8cba52", 5: "#8cc4d6", 6: "#007a63", 7: "#705421", 8: "#69c4ad", 9: "#008000", 10: "#000080", 11: "#800080", 12: "#c0c0c0"};
 // use a CQL parser for easy filter creation
 var format = new OpenLayers.Format.CQL();
@@ -30,10 +30,11 @@ var format = new OpenLayers.Format.CQL();
 //				"OWRBMW":{fillColor: "#bd2126"},"WQP":{fillColor: "#5258ba"}}
 //var ss =
 // this rule will get a filter from the CQL text in the form
+//Dialog for filter
 
-	//myStyles1.addUniqueValueRules("Default","Source",colorlookup)
-var colorlookup={"USGS":{fillColor: "#5258ba"},"OWRBMWW":{fillColor: "#bd2126"},"OWRB":{fillColor: "#5258ba"},
-				"OWRBMW":{fillColor: "#bd2126"},"WQP":{fillColor: "#5258ba"}}
+//myStyles1.addUniqueValueRules("Default","Source",colorlookup)
+var colorlookup = {"USGS": {fillColor: "#5258ba"}, "OWRBMWW": {fillColor: "#bd2126"}, "OWRB": {fillColor: "#5258ba"},
+	"OWRBMW": {fillColor: "#bd2126"}, "WQP": {fillColor: "#5258ba"}}
 
 
 var rule = new OpenLayers.Rule({
@@ -82,6 +83,62 @@ var filter = {'source': null, 'watershed': null, 'aquifer': null, 'type': null};
 var cfilter = {'source': null, 'watershed': null, 'aquifer': null, 'type': null};
 //on window load
 $(window).ready(function () {
+	//dialog filter
+	$("#dialog-filter").dialog({
+		autoOpen: false,
+		height: 750,
+		width: 350,
+		position: [340, 150],
+		title: "<b>Data Source Filter</b>",
+		close: function () {
+			//$("#bibAll" + ref_no).remove();
+		}
+	});
+	//dialog Data Sources
+	$("#dialog-data").dialog({
+		autoOpen: false,
+		height: 750,
+		width: 350,
+		position: [340, 150],
+		title: '<span class="icon-plus"></span><b>Add Data Source </b>',
+		close: function () {
+			//$("#bibAll" + ref_no).remove();
+		}
+	});
+
+	//dialog Data Sources
+	$("#dialog-geo").dialog({
+		autoOpen: false,
+		height: 750,
+		width: 350,
+		position: [340, 150],
+		title: '<span class="icon-filter"><b>Add Data Source </b>',
+		close: function () {
+			//$("#bibAll" + ref_no).remove();
+		}
+	});
+	$("#data-btn").click(function (){
+		$("#dialog-data")
+				.dialog('option','title', "<b>Add Data Source</b>")
+				.dialog('open');
+
+	});
+	$("#watershed-btn").click(function (){
+		$('.HIDE_ALL').hide();
+		$('.WSHED').show();
+		$("#dialog-geo")
+				.dialog('option','title', "<b>Watershed Filter</b>")
+				.dialog('open');
+
+	});
+	$("#aquifer-btn").click(function (){
+		$('.HIDE_ALL').hide();
+		$('.AQRS').show();
+		$("#dialog-geo")
+				.dialog('option','title', "<b>Aquifer Filter</b>")
+				.dialog('open');
+
+	});
 	//console.log('Map.js start')
 	options = {
 		spericalMercator: true,
@@ -162,8 +219,8 @@ $(window).ready(function () {
 		"highlight": new OpenLayers.Style({ fillOpacity: 0.5, fillColor: "#F6358A", graphicZIndex: 2 }),
 		"select": {fillOpacity: 1, strokeColor: "white", fillColor: "#8CBA52", graphicZIndex: 0}
 	});
-	var ss =  {"default": new OpenLayers.Style(null, {rules: [rule]}),"select":new OpenLayers.Style({fillColor:"#F6358A"}, {rules: [rule]})
-				}
+	var ss = {"default": new OpenLayers.Style(null, {rules: [rule]}), "select": new OpenLayers.Style({fillColor: "#F6358A"}, {rules: [rule]})
+	}
 	//myStyles1 = new OpenLayers.StyleMap({"default": new OpenLayers.Style(null, {rules: [rule]})});
 	//myStyles1.addUniqueValueRules("Default","Source",colorlookup)
 	//var colorlookup={"USGS":{fillColor: "#5258ba"},"OWRBMWW":{fillColor: "#bd2126"},"OWRB":{fillColor: "#5258ba"},
@@ -172,7 +229,8 @@ $(window).ready(function () {
 	siteLayer = new OpenLayers.Layer.Vector("Sites", {styleMap: myStyles1});
 	//siteLayer = new OpenLayers.Layer.Vector("Sites", {styleMap: ss});
 	$("#totmsg").show().html("Loading . . .");
-	load_sites(siteLayer, baseurl + sources['USGS'].url, 'USGS', sources['USGS'].mapping,"#437C17");
+	load_sites(siteLayer, baseurl + sources['USGS'].url, 'USGS', sources['USGS'].mapping,"#00BB22");// "#FFFF66"); // "#437C17");
+	filter['USGS_type']=[];
 	drawLayer = new OpenLayers.Layer.Vector("Draw Layer", {styleMap: myStyles, 'displayInLayerSwitcher': false});//    new OpenLayers.Style({ fillOpacity: 1, fillColor: "#F6358A", graphicZIndex: 2 })});
 	filterLayer = new OpenLayers.Layer.Vector("Filter Layer", {styleMap: myStyles});
 	map.addLayer(drawLayer);//[polygonLayer,circleLayer,boxLayer]);
@@ -452,9 +510,9 @@ function apply_filter () {
 	} else if ($('#select_sites').val() == "OWRB_LOG") {
 		$('#subdata').hide();
 		$('#county').show();
-		source=$('#county').val();
+		source = $('#county').val();
 		filt = "Source = '" + source + "'";
-	}else {
+	} else {
 		$('#subdata').hide()
 		$('#county').hide();
 		source = $('#select_sites').val() //.split("_");
@@ -527,9 +585,11 @@ function type_filter (div) {
 	apply_current();
 	apply_filter();
 }
+function padStr(i) {
+    return (i < 10) ? "0" + i : "" + i;
+}
 
-
-function load_sites (layer, url, source, mapping,color) {
+function load_sites (layer, url, source, mapping, color) {
 	loaded_sources.push(source);
 	var mess = 'Loading.... ' + $('#select_sites option:selected').text()
 	$.blockUI({ message: mess, css: {
@@ -542,6 +602,7 @@ function load_sites (layer, url, source, mapping,color) {
 		color: '#fff'
 	} });
 	$.getJSON(url, function (fdata) {
+		var ct =0;
 		$.each(fdata, function (key, val) {
 			sitesTotal.push(val);
 
@@ -552,10 +613,51 @@ function load_sites (layer, url, source, mapping,color) {
 			modtype = modtype.replace(/\s+/g, '');
 			modtype = modtype.replace(/,/g, '');
 			modtype = modtype.replace('(', '_')
+			modtype = modtype.replace(':', '')
+			modtype = modtype.replace('/', '')
 			modtype = modtype.replace(')', '')
+			var last_activity = '';
 			var aqui = '';
 			var huc4 = '';
 			var huc8 = '';
+			var aquifers =[];
+			if('aquifers' in val){
+				$.each(val['aquifers'],function(k,v){
+					//console.log(v)
+					aquifers.push(v.name.replace(/\s+/g, '').replace(/-/g, '').replace(/,/g, ''))
+				})
+				//console.log(aquifers)
+			}
+			if ('last_activity' in val){
+				last_activity =val['last_activity'].replace(/\s+/g, '').replace(/-/g, '');
+
+			}else{
+				if (source == 'MESONET'){
+					var temp = new Date();
+					var dateStr = padStr(temp.getFullYear()) + padStr(1 + temp.getMonth()) + padStr(temp.getDate())
+					last_activity = dateStr
+				}
+				if (source == 'OWRBMW'){
+					var temp = val['endDT'].replace(/\s+/g,'')
+					//last_activity =
+					if(temp== 'present'){
+						var temp = new Date();
+						var dateStr = padStr(temp.getFullYear()) + padStr(1 + temp.getMonth()) + padStr(temp.getDate())
+						last_activity = dateStr
+					}else{
+						var ltemp=temp.split('/')
+						last_activity = ltemp[2] + padStr(parseInt(ltemp[0])) + padStr(parseInt(ltemp[1]))
+					}
+					console.log(last_activity)
+				}
+				if (source.split('_')[0]=='OWRB'){
+					if (val['CONST_DATE']!== null){
+						last_activity = val['CONST_DATE'].replace(/\//g,'').replace(/\s+/g,'')
+					}
+				}
+			}
+
+
 			if (val[mapping.aquifer]) {
 				aqui = val[mapping.aquifer].replace(/-/g, '');
 				aqui = aqui.replace(/\s+/g, '');
@@ -566,12 +668,12 @@ function load_sites (layer, url, source, mapping,color) {
 			if (val[mapping.huc_8]) {
 				huc8 = val[mapping.huc_8];
 			}//.huc_8;}
-			if (huc4=='' && huc8.length>=4){
-				huc4=huc8.substring(0, 4);
+			if (huc4 == '' && huc8.length >= 4) {
+				huc4 = huc8.substring(0, 4);
 			}
 			pointFeature.attributes = {"REF_NO": val[mapping.REF_NO], "Sitename": val[mapping.Sitename], "State": "OK", "Status": val[mapping.Status],
 				"Source": source.replace(/-/g, ''), "SiteType": modtype, 'lat': val[mapping.lat], 'lon': val[mapping.lon],
-				'aquifer': aqui, 'huc_4': huc4, 'huc_8': huc8,'color': color }; //"#5258ba"};
+				'aquifer': aqui, 'huc_4': huc4, 'huc_8': huc8, 'color': color,'aquifers':aquifers,'last_activity':last_activity}; //"#5258ba"};
 			layer.addFeatures(pointFeature);
 			sitesActive.push(val[mapping.REF_NO]);
 
@@ -673,27 +775,27 @@ function onPopupClose (evt) {
 	}
 }
 function onFeatureSelectNav (evt) {
-	if(evt_bool==true){
-	feature = evt.feature;
-	//new OpenLayers.Size(600,200)  feature.geometry.getBounds().getCenterLonLat()
-	content = "<b>" + feature.attributes.Sitename + "</b><table class='table-condensed' style='margin-bottom:5px;margin-right:10px;'>" +
-		"<tr><th>ID</th><td>" + feature.attributes.REF_NO + "</td></tr>" +
-		"<tr><th>Type</th><td>" + feature.attributes.SiteType + "</td></tr>" +
-		"<tr><th>Status</th><td>" + feature.attributes.Status + "</td></tr>" +
-		"<tr><td colspan='2'><a style='color:blue;' href='#' onclick='showbib(" + '"' + feature.attributes.REF_NO + '"' +',"' + feature.attributes.Source + '"' + ")'>Data Access</a></td></tr>" +
-		"<tr><td colspan='2'><a style='color:blue;' href='http://maps.google.com/maps?z=15&t=k&q=loc:" + feature.attributes.lat + "," + feature.attributes.lon +
-		"' target='_blank'>Google Maps</a></td></tr></table>"
-        //new OpenLayers.Size(100, 100)
-	popup = new OpenLayers.Popup.FramedCloud("featurePopup", feature.geometry.getBounds().getCenterLonLat(), new OpenLayers.Size(100, 100),
-		content, null, true, onPopupClose);
-	popup.panMapIfOutOfView = true;
-	feature.popup = popup;
-	popup.feature = feature;
-	map.addPopup(popup, true);
+	if (evt_bool == true) {
+		feature = evt.feature;
+		//new OpenLayers.Size(600,200)  feature.geometry.getBounds().getCenterLonLat()
+		content = "<b>" + feature.attributes.Sitename + "</b><table class='table-condensed' style='margin-bottom:5px;margin-right:10px;'>" +
+			"<tr><th>ID</th><td>" + feature.attributes.REF_NO + "</td></tr>" +
+			"<tr><th>Type</th><td>" + feature.attributes.SiteType + "</td></tr>" +
+			"<tr><th>Status</th><td>" + feature.attributes.Status + "</td></tr>" +
+			"<tr><td colspan='2'><a style='color:blue;' href='#' onclick='showbib(" + '"' + feature.attributes.REF_NO + '"' + ',"' + feature.attributes.Source + '"' + ")'>Data Access</a></td></tr>" +
+			"<tr><td colspan='2'><a style='color:blue;' href='http://maps.google.com/maps?z=15&t=k&q=loc:" + feature.attributes.lat + "," + feature.attributes.lon +
+			"' target='_blank'>Google Maps</a></td></tr></table>"
+		//new OpenLayers.Size(100, 100)
+		popup = new OpenLayers.Popup.FramedCloud("featurePopup", feature.geometry.getBounds().getCenterLonLat(), new OpenLayers.Size(100, 100),
+			content, null, true, onPopupClose);
+		popup.panMapIfOutOfView = true;
+		feature.popup = popup;
+		popup.feature = feature;
+		map.addPopup(popup, true);
 	}
 }
 function onFeatureUnselect (evt) {
-	if(evt_bool==true){
+	if (evt_bool == true) {
 		feature = evt.feature;
 		if (feature.popup) {
 			popup.feature = null;
@@ -729,15 +831,15 @@ function executeFunctionWithCursor () {
 	setTimeout("doAdvSearch()", 1);
 	setTimeout("document.body.style.cursor = 'auto';map.div.style.cursor='default';", 1);
 }
-function showbib (ref_no,source) {
+function showbib (ref_no, source) {
 	//var source = $('#select_sites').val().split("_");
 	if ($("#bibAll" + ref_no).length < 1) {
 		$("body").append('<div id="bibAll' + ref_no + '"></div>');
 		$("#bibAll" + ref_no).dialog({ height: 'auto', width: '900px', position: [300, 100], title: "<h3>Data</h3>", close: function () {
 			$("#bibAll" + ref_no).remove();
 		} });
-		var srce = source.split("_")[0]
-		$("#bibAll" + ref_no).append('<iframe id="iframe' + ref_no + '" src="/tools/usgs_metadata/' + ref_no + '?source=' + srce + '" width="100%" height="700"></iframe>');
+		//var srce = source.split("_")[0]
+		$("#bibAll" + ref_no).append('<iframe id="iframe' + ref_no + '" src="/tools/usgs_metadata/' + ref_no + '?source=' + source + '" width="100%" height="700"></iframe>');
 	}
 }
 function setcursor () {
@@ -774,7 +876,7 @@ function savesites () {
 	var name = $("#selname").val();
 
 	if (selnum == 1) {
-		$("#selAccordion").prepend("<div id='all' class='alert alert-info' style='text-align:center;'><b>ALL:</b> &nbsp; <a href='#' onclick='viewall();'>List Floras</a> &bull;  <a href='#' onclick='highlightall();'>Map Selection</a> &bull; <a href='#' onclick='plotall();'>Species-area relationship</a><div id='showPlotAll'></div></div>");
+		$("#selAccordion").prepend("<div id='all' class='alert alert-info' style='text-align:center;'><b>ALL:</b><a href='#' onclick='highlightall();'>Map Selection</a> &bull; <a href='#' onclick='plotall();'>Species-area relationship</a><div id='showPlotAll'></div></div>");
 	}
 
 	$("#selAccordion").append('\

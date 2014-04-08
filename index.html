@@ -7,6 +7,7 @@
     <meta name="description" content="Oklahoma Water Survey - Data Portal">
     <meta name="author" content="OU IT Informatics">
 
+
     <link rel=stylesheet
           href="http://worker.oklahomawatersurvey.org/portal/jqui/development-bundle/themes/base/jquery.ui.all.css"
           type="text/css" media="screen, print">
@@ -18,6 +19,7 @@
           type="text/css" media="screen, print">
     <!--<link rel=stylesheet href="http://worker.oklahomawatersurvey.org/portal/jquery.qtip.custom/jquery.qtip.css"
           type="text/css">-->
+    <link rel=stylesheet href="style.css" type="text/css" media="screen, print">
     <script type="text/javascript" src="http://worker.oklahomawatersurvey.org/portal/js/simpleCart.min.js"></script>
     <!--1.7.2-->
     <script src="http://worker.oklahomawatersurvey.org/portal/js/jquery-1.7.2.min.js"></script>
@@ -46,7 +48,7 @@
     <script type="text/javascript" src="map.js"></script>
     <script type="text/javascript" src="portal.js"></script>
     <script type="text/javascript" src="cctasks.js"></script>
-    <link rel=stylesheet href="style.css" type="text/css" media="screen, print">
+
     <script type="javascript">
         jQuery(document).ready(function ($) {
             $('#myTab').tab();
@@ -66,10 +68,10 @@
                 }
                 return activated;
             };
-            $('.hasTooltip').each(function() { // Notice the .each() loop, discussed below
+            $('.hasTooltip').each(function () { // Notice the .each() loop, discussed below
                 $(this).qtip({
                     content: {
-                    text: $(this).next('div') // Use the "div" element next to this for the content
+                        text: $(this).next('div') // Use the "div" element next to this for the content
                     }
                 });
             });
@@ -165,12 +167,18 @@
                         <ul class="nav nav-list" style="padding-left:1px;padding-right:1px;">
                             <li class="nav-header"><h4>Data Portal</h4>Search Options</li>
                             <li class="divider"></li>
+                            <div class="btn-group">
+                                  <button id="data-btn" class="btn my-nav-btn1"><span class="icon-plus"></span>Data</button>
+                                  <button id="watershed-btn" class="btn my-nav-btn2"><span class="icon-filter"></span>Watersheds</button>
+                                  <button id="aquifer-btn" class="btn my-nav-btn3"><span class="icon-filter"></span>Aquifers</button>
+                            </div>
+                            <li class="divider"></li>
                             <li class="nav-header">Data Sources</li>
-                               <div id="currentSource">
-                                   <ul id="sourceFilt" class="nav" style="padding-left:1px;padding-right:1px;">
+                            <div id="currentSource">
+                                <ul id="sourceFilt" class="nav" style="padding-left:1px;padding-right:1px;">
 
                                 </ul>
-                               </div>
+                            </div>
                             <!--<select id='select_sites' class="selectpicker">
                                 <option value="USGS">USGS Active Sites</option>
                                 <option value="WQP">Water Quality Portal</option>
@@ -197,20 +205,21 @@
                                     <span id="type-title" class="nav-header">Type:</span>
                                 </ul>
                             </div>
-                            <!--</ul>-->
+                            <!--</ul>
                             <li class="nav-header"> Select Data Sources and Filters</li>
-                            <div id="accordSource" class="accordion-group">
+                            <div class="accordion" id="accordion2">
+                                <div id="accon2" class="accordion-group">
                                     <div class="accordion-heading">
                                         <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2"
                                            href="#accordsource">Data Sources</a>
                                     </div>
                                     <div id="accordsource" class="accordion-body collapse">
                                         <div class="accordion-inner" style="padding:1px 1px;">
-                                            <div id="datasource"></div>
-                                        </div>
+                                            <!--<div id="datasource"></div>-->
+                                        <!--</div>
                                     </div>
                                 </div>
-                            <div class="accordion" id="accordion2">
+
                                 <div class="accordion-group">
                                     <div class="accordion-heading">
                                         <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2"
@@ -220,8 +229,8 @@
 
                                         <div class="accordion-inner"
                                              style="padding-left:5px;padding-top:5px;padding-right:1px;">
-                                            <div id="watershd"></div>
-                                        </div>
+                                            <!--<div id="watershd"></div>-->
+                                        <!--</div>
                                     </div>
                                 </div>
                                 <div id="accordAquifer" class="accordion-group">
@@ -231,11 +240,11 @@
                                     </div>
                                     <div id="accordaquifer" class="accordion-body collapse">
                                         <div class="accordion-inner" style="padding:1px 1px;">
-                                            <div id="aquifers"></div>
-                                        </div>
+                                            <!--<div id="aquifers"></div>-->
+                                        <!--</div>
                                     </div>
-                                </div>
-                                <div id="accordType" class="accordion-group">
+                                </div>-->
+                                <!--<div id="accordType" class="accordion-group">
                                     <div class="accordion-heading">
                                         <a class="accordion-toggle " data-toggle="collapse" data-parent="#accordion2"
                                            href="#accordtype">Site Classification</a>
@@ -243,19 +252,21 @@
                                     <div id="accordtype" class="accordion-body collapse">
                                         <div class="accordion-inner"
                                              style="padding-left:5px;padding-top:5px;padding-right:1px;">
-                                            <h5 id="label5" class="nav-header" style="margin-left:-7px;">Site Type</h5>
+                                            <!--<h5 id="label5" class="nav-header" style="margin-left:-7px;">Site Type</h5>
 
-                                            <div id="usgs_type" class="filter-dim filter-ul"></div>
-                                            <div id="mesonet_type" class="filter-dim filter-ul"></div>
-                                            <div id="owrb_type" class="filter-dim filter-ul"></div>
-                                            <div id="owrbmw_type" class="filter-dim filter-ul"></div>
+                                            <div id="usgs_type" class="filter-dim filter-ul USGS TYPE_FILTER"></div>
+                                            <div id="mesonet_type"
+                                                 class="filter-dim filter-ul MESONET TYPE_FILTER"></div>
+                                            <div id="owrb_type" class="filter-dim filter-ul OWRB_LOG TYPE_FILTER"></div>
+                                            <div id="owrbmw_type"
+                                                 class="filter-dim filter-ul OWRBMW OWRBMWW TYPE_FILTER"></div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div>-->
 
                         </ul>
-                        <img  src="ows_logo1.png" alt="Oklahoma Water Survey"/>
+                        <img src="ows_logo1.png" alt="Oklahoma Water Survey"/>
 
                     </div>
                     <div class="well alert-success">
@@ -316,7 +327,22 @@
     </table>
 </div>
 <div id="dialog-filter">
+    <h5 id="label5" class="nav-header" style="margin-left:-7px;">Data Type Filter</h5>
 
+    <div id="usgs_type" class="filter-dim filter-ul USGS TYPE_FILTER"></div>
+    <div id="mesonet_type" class="filter-dim filter-ul MESONET TYPE_FILTER"></div>
+    <div id="owrb_type" class="filter-dim filter-ul OWRBMW  TYPE_FILTER"></div>
+    <div id="owrbmw_type" class="filter-dim filter-ul OWRB_LOG  TYPE_FILTER"></div>
+    <div id="owrbmww_type" class="filter-dim filter-ul OWRBMWW TYPE_FILTER"></div>
+    <div id="wqp_type" class="filter-dim filter-ul WQP TYPE_FILTER"></div>
+
+</div>
+<div id="dialog-data">
+    <div id="datasource"></div>
+</div>
+<div id="dialog-geo">
+    <div id="watershd" class="HIDE_ALL WSHED"></div>
+    <div id="aquifers" class="HIDE_ALL AQRS"></div>
 </div>
 <div id="advSearch">
     <div class="accordion" id="accordion2">
