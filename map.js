@@ -21,6 +21,7 @@ var savflg = 0;
 var qry = '';
 var enqry = '';
 var fff;
+var i =0;
 var colorcount = 0
 var stylesColor = {0: "#0000ff", 1: "#b575b5", 2: "#f5914d", 3: "#bd2126", 4: "#8cba52", 5: "#8cc4d6", 6: "#007a63", 7: "#705421", 8: "#69c4ad", 9: "#008000", 10: "#000080", 11: "#800080", 12: "#c0c0c0"};
 // use a CQL parser for easy filter creation
@@ -79,7 +80,7 @@ var sources = {'USGS': {'url': "/mongo/db_find/ows/usgs_site/{'spec':{'status':'
 			'aquifer': 'aquifer', 'huc_4': 'huc_4', 'huc_8': 'huc_8' }
 	}
 }
-var filter = {'source': null, 'watershed': null, 'aquifer': null, 'type': null};
+var filter = {'source': null, 'watershed': null, 'aquifer': null, 'type': null,'last_activity':null};
 var cfilter = {'source': null, 'watershed': null, 'aquifer': null, 'type': null};
 //on window load
 $(window).ready(function () {
@@ -116,6 +117,43 @@ $(window).ready(function () {
 		close: function () {
 			//$("#bibAll" + ref_no).remove();
 		}
+	});
+	//dialog Last Activity Sources
+	$("#dialog-last-act").dialog({
+		autoOpen: false,
+		width: 325,
+		position: [340, 350],
+		title: '<span class="icon-filter"><b>=Last Activity Date</b>',
+		close: function () {
+			//$("#bibAll" + ref_no).remove();
+		}
+	});
+	$('#set-last-date').click(function(){
+		if ($('#set_date').val()!==""){
+			temp =$('#set_date').val().split('/')
+			filter.last_activity = temp[2] + temp[0] + temp[1];
+			setFilter.set();
+			$('#setact a').text('Site Activity >=' + $('#set_date').val());
+			$('#setact').show()
+			$("#dialog-last-act").dialog("close");
+		}else{
+			alert("Error, Please enter Filter Date.");
+		}
+
+	});
+	$('#setact').click(function(){
+		filter.last_activity = null;
+		setFilter.set();
+		$('#setact').hide();
+	});
+	$("#last-act-btn").click(function (){
+		console.log(i);
+		$('#dp3 input').datepicker({defaultDate:"-1m", maxDate: new Date(), changeYear: true });
+		$("#dialog-last-act")
+				.dialog('option','title', "<b>Last Activity</b>")
+				.dialog('open');
+
+
 	});
 	$("#data-btn").click(function (){
 		$("#dialog-data")
@@ -648,7 +686,7 @@ function load_sites (layer, url, source, mapping, color) {
 						var ltemp=temp.split('/')
 						last_activity = ltemp[2] + padStr(parseInt(ltemp[0])) + padStr(parseInt(ltemp[1]))
 					}
-					console.log(last_activity)
+					//console.log(last_activity)
 				}
 				if (source.split('_')[0]=='OWRB'){
 					if (val['CONST_DATE']!== null){

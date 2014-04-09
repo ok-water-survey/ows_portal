@@ -41,6 +41,7 @@ var setFilter = {
 		}
 		var wsaq = '';//'',aq='',ty='';
 		var wsaq1 ='';
+		var last_act ='';
 		if (filter.watershed !== null && filter.aquifer !== null) {
 			wsaq1 = filter.aquifer
 			wsaq = filter.watershed.concat(filter.aquifer);
@@ -59,12 +60,15 @@ var setFilter = {
 				wsaq = ' AND (' + wsaq + ' OR ' + wsaq1 + ')'
 			}
 		}
+		if (filter.last_activity !== null){
+			last_act = " AND (last_activity >= '" + filter.last_activity + "')"
+		}
 		//if (filter.type !== null) {
 		//	ty = ' AND (' + filter.type.join(' OR ') + ')'
 		//} else {
 		//	ty = ''
 		//}
-		filt = filt + wsaq // + ty
+		filt = filt + wsaq  + last_act // + ty
 		console.log(filt);
 		updateFilter(filt);
 		siteLayer.redraw();

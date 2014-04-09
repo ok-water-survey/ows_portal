@@ -24,8 +24,7 @@
     <!--1.7.2-->
     <script src="http://worker.oklahomawatersurvey.org/portal/js/jquery-1.7.2.min.js"></script>
 
-    <script type="text/javascript"
-            src="http://worker.oklahomawatersurvey.org/portal/js/jquery-ui-1.8.10.custom.min.js"></script>
+
     <script type="text/javascript" src="http://worker.oklahomawatersurvey.org/portal/js/jquery.blockUI.js"></script>
     <script type="text/javascript"
             src="http://worker.oklahomawatersurvey.org/portal/css/bootstrap/js/bootstrap.min.js"></script>
@@ -38,8 +37,12 @@
     <script type="text/javascript"
             src="http://worker.oklahomawatersurvey.org/portal/flotlabels/jquery.flot.axislabels.js"></script>
     <script type="text/javascript"
-            src="http://worker.oklahomawatersurvey.org/portal/jquery.qtip-1.0.0-rc3.custom/jquery.qtip-1.0.0-rc3.min.js"></script>
+            src="http://worker.oklahomawatersurvey.org/portal/js/jquery-ui-1.8.10.custom.min.js"></script>
     <!--<script type="text/javascript"
+            src="http://worker.oklahomawatersurvey.org/portal/js/datepicker/js/bootstrap-datepicker1.js"></script>-->
+    <!--<script type="text/javascript"
+            src="http://worker.oklahomawatersurvey.org/portal/jquery.qtip-1.0.0-rc3.custom/jquery.qtip-1.0.0-rc3.min.js"></script>
+    <script type="text/javascript"
             src="http://worker.oklahomawatersurvey.org/portal/js/bootstrap/bootstrap-tab.js"></script>
     <script src="http://worker.oklahomawatersurvey.org/portal/js/bootstrap/bootstrap-dropdown.js"></script>-->
 
@@ -52,6 +55,19 @@
     <script type="javascript">
         jQuery(document).ready(function ($) {
             $('#myTab').tab();
+            /*$.datepicker.setDefaults({
+                showOn: "both",
+                buttonImageOnly: true,
+                buttonImage: "calendar.gif",
+                buttonText: "Calendar"
+            });
+            $('.setdate').click(function(){
+                $('#dp3 input').datepicker()
+            })*/
+            //$('#sandbox-container input').datepicker({});
+            //$("#end_date").datepicker({ changeYear: true } );
+            //$( "#datepicker" ).datepicker();
+            //$('#dp3').datepicker();
             //$("#menu").menu();
             //$('.tooltip').tooltipster()
             //Override Openlayers
@@ -190,19 +206,31 @@
                             </select>
                             <select id="subdata"></select>
                             <select id="county"></select>-->
-                            <li class="nav-header">Current Filter</li>
-                            <div id='curretnfilter' style="margin-left:10px;">
-                                <ul id="currentFilt" class="nav nav-list" style="padding-left:1px;padding-right:1px;">
 
-                                </ul>
+                            <div id='curretnfilter' style="margin-left:5px;margin-bottom:15px;">
+                                <!--<li class="nav-header">Current Filter</li>-->
+
                                 <ul id="currentFilt_wshd" class="nav filter">
-                                    <span class="nav-header">Watershed:</span>
+                                    <span class="nav-header">Watersheds Filters:</span>
                                 </ul>
                                 <ul id="currentFilt_aquifer" class="nav filter">
-                                    <span class="nav-header">Aquifer:</span>
+                                    <span class="nav-header">Aquifer Filters:</span>
                                 </ul>
                                 <ul id="currentFilt_type" class="nav filter">
                                     <span id="type-title" class="nav-header">Type:</span>
+                                </ul>
+                                <span class="nav-header">Last Activity Date:</span>
+                                 <div class="btn-group">
+                                     <button id="last-act-btn" class="btn btn-small"><span class="icon-filter"></span>Filter</button>
+                                     <span id="setact" style="display:none" align="center">
+                                     <i class="icon-remove-circle" rel="tooltip" id="blah" data-original-title="Remove Date"></i>
+                                     <a href="#" >Site Activty >= </a></span>
+                                 </div>
+
+                                <ul id="currentFilt" class="nav nav-list">
+
+
+
                                 </ul>
                             </div>
                             <!--</ul>
@@ -343,6 +371,25 @@
 <div id="dialog-geo">
     <div id="watershd" class="HIDE_ALL WSHED"></div>
     <div id="aquifers" class="HIDE_ALL AQRS"></div>
+
+</div>
+<div id="dialog-last-act">
+    <div id="last_act">
+        <span><b>Set Last activity date filter:</b></br></span>
+
+        <div id="dp3" >
+            <span style="padding:10px; ">
+            <label for="set_date" style="display:inline;">Filter Date:&nbsp;&nbsp;</label><input id="set_date"  class="span2 setdate" size="18" type="text" readonly>
+		    </span>
+            <p>Sites with activity on or after date will be visible.</p>
+            <div class="btn-group" style="float: right;">
+             <button id="set-last-date" class="btn btn-small btn-right"><span class="icon-plus"></span>Add</button>
+            </div>
+	    </div>
+
+
+
+    </div>
 </div>
 <div id="advSearch">
     <div class="accordion" id="accordion2">
