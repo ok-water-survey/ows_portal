@@ -155,7 +155,7 @@ MVC.Collections.Aquifers = Backbone.Collection.extend({
 });
 MVC.Collections.Data_filters = Backbone.Collection.extend({
 	model: MVC.Models.Data_filter,
-	url: "/catalog/db_find/ows-portal/data/{'spec':{'model':'filter-types'},'sort':[('order',1)]}/"
+	url: "/catalog/db_find/ows-portal/data/{'spec':{'model':'filter-types','status':'Active'},'sort':[('order',1)]}/"
 });
 MVC.Collections.WQPS = Backbone.Collection.extend({
 	model: MVC.Models.WQP,
