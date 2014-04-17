@@ -235,8 +235,9 @@ var agoDate = myDate.yyyymmdd();
 				} else if (i < 10) {
 					$("#waterdash2").append('<li>' + val.name + '<ul>' + subs + '</ul></li>');
 				} else {
-					$("#waterdash3").append('<script src = "/dashboard/cluetip/jquery.cluetip.js"></script><script src="/dashboard/cluetip/lib/jquery.hoverIntent.js"></script><script src="/dashboard/cluetip/demo/demo.js"></script><link rel="stylesheet" href="/dashboard/cluetip/jquery.cluetip.css" type="text/css" /><li>' + val.name + '<ul>' + subs + '</ul></li>');
-				}
+			//		$("#waterdash3").append('<script src = "/dashboard/cluetip/jquery.cluetip.js"></script><script src="/dashboard/cluetip/lib/jquery.hoverIntent.js"></script><script src="/dashboard/cluetip/demo/demo.js"></script><link rel="stylesheet" href="/dashboard/cluetip/jquery.cluetip.css" type="text/css" /><li>' + val.name + '<ul>' + subs + '</ul></li>');
+			$("#waterdash3").append('<li>' + val.name + '<ul>' + subs + '</ul></li>');
+	}
 			});
 
 		} catch (err) {
