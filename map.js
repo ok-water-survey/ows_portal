@@ -302,7 +302,7 @@ $(window).ready(function () {
 		$("#helpAll").dialog({ height: 500, width: 850, title: "<h3>How To Use Data Portal</h3><h4>Version: " + verDate[0] + "</h4><h5>" + verDate[1] + "</h5>", close: function () {
 			$("#helpAll").remove();
 		} });
-		$("#helpAll").append('</br><b>Please click link below:</b></br></br><a href="http://static.cybercommons.org/OklahomaWaterSurvey/ows_manual.pdf" style="color:#2175A6;" target="_blank">Help and Instructions for Data Portal</a>');
+		$("#helpAll").append('</br><b>Please click link below:</b></br></br><a href="http://oklahomawatersurvey.org/pdf/owsportalhelp.pdf" style="color:#2175A6;" target="_blank">Help and Instructions for Data Portal</a>');
 	});
 
 	$("#selinfo").dialog({ autoOpen: false, height: 500, width: 800, position: [40, 50],
