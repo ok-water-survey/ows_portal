@@ -103,7 +103,6 @@ function load_dash () {
 
 	$.getJSON(url, function (fdata) {
 		try {
-			//$("#waterdash").append('<script src = "/dashboard/cluetip/jquery.cluetip.js"></script><script src="/dashboard/cluetip/lib/jquery.hoverIntent.js"></script><script src="/dashboard/cluetip/demo/demo.js"></script><link rel="stylesheet" href="/dashboard/cluetip/jquery.cluetip.css" type="text/css" />')
 			$.each(fdata[0], function (key, val) {
 				i = i + 1;
 				subs = ''
@@ -117,12 +116,12 @@ function load_dash () {
 				} else {
 					//$("#waterdash3").append('<script src = "/dashboard/cluetip/jquery.cluetip.js"></script><script src="/dashboard/cluetip/lib/jquery.hoverIntent.js"></script><script src="/dashboard/cluetip/demo/demo.js"></script><link rel="stylesheet" href="/dashboard/cluetip/jquery.cluetip.css" type="text/css" /><li>' + val.name + '<ul>' + subs + '</ul></li>');
 					$("#waterdash3").append('<li>' + val.name + '<ul>' + subs + '</ul></li>');
-					$("#wshedscript").append('<script src = "/dashboard/cluetip/jquery.cluetip.js"></script><script src="/dashboard/cluetip/lib/jquery.hoverIntent.js"></script><script src="/dashboard/cluetip/demo/demo.js"></script><link rel="stylesheet" href="/dashboard/cluetip/jquery.cluetip.css" type="text/css" />');
 				}
 			});
-
 		} catch (err) {
 			var loaderr = 'error';
 		}
+
+$("#wshedscript").append('<script src = "/dashboard/cluetip/jquery.cluetip.js"></script><script src="/dashboard/cluetip/lib/jquery.hoverIntent.js"></script><script src="/dashboard/cluetip/demo/demo.js"></script><link rel="stylesheet" href="/dashboard/cluetip/jquery.cluetip.css" type="text/css" />');
 	});
 }
