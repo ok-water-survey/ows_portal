@@ -76,6 +76,7 @@ $(function () {
 	$(window).resize(function () {
 
 		$("#cartPopover").offset({ left: $(window).width() - 421, top: window.scrollY + 65});
+                map.baseLayer.redraw();
 	});
 
 	load_dash();
