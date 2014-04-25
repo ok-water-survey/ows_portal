@@ -44,7 +44,7 @@ var rule = new OpenLayers.Rule({
 var myStyles1 = new OpenLayers.StyleMap({"default": new OpenLayers.Style(null, {rules: [rule]})});
 //var newRule = myStyles1.addUniqueValueRules("default","Source",colorlookup)
 //Default load of USGS Initital load
-var sources = {'USGS': {'url': "/mongo/db_find/ows/usgs_site/{'spec':{'status':'Active'},'fields':{'parameter':0,'webservice':0}}/?callback=?",
+var sources = {'USGS': {'url': "/mongo/db_find/ows/usgs_site/{'spec':{'status':'Active'},'fields':{'parameter':0}}/?callback=?",
 	'mapping': {'REF_NO': 'site_no', 'Sitename': 'station_nm', 'Status': 'status',
 		'SiteType': 'site_tp_cd', 'lat': 'dec_lat_va', 'lon': 'dec_long_va',
 		'aquifer': 'aquifer', 'huc_4': 'huc_4', 'huc_8': 'huc_8'}
@@ -392,7 +392,18 @@ function load_sites (layer, url, source, mapping, color) {
 				//console.log(aquifers)
 			}
 			if ('last_activity' in val){
+                                if (source == 'USGS'){
+                                    if (val['webservice'].indexOf("uv")>-1 || val['webservice'].indexOf("iv")>-1 || val['webservice'].indexOf("rt")>-1){
+                                        var temp = new Date();
+                                        var dateStr = padStr(temp.getFullYear()) + padStr(1 + temp.getMonth()) + padStr(temp.getDate())
+                                        last_activity = dateStr
+                                    
+                                    }else{
+                                        last_activity =val['last_activity'].replace(/\s+/g, '').replace(/-/g, '');
+                                    } 
+                                }else{
 				last_activity =val['last_activity'].replace(/\s+/g, '').replace(/-/g, '');
+                                }
 
 			}else{
 				if (source == 'MESONET'){
