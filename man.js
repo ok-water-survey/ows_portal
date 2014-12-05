@@ -927,9 +927,9 @@ MVC.Router = Backbone.Router.extend({
 		MVC.aquifers = new MVC.Collections.Aquifers();
 		new MVC.Views.Aquifers({ collection: MVC.aquifers }); //Add this line
 		MVC.aquifers.fetch();
-		MVC.types = new MVC.Collections.Data_filters()
-		new MVC.Views.sourceFilters({ collection: MVC.types });//Add this line
-		MVC.types.fetch();
+		//MVC.types = new MVC.Collections.Data_filters()
+		//new MVC.Views.sourceFilters({ collection: MVC.types });//Add this line
+		//MVC.types.fetch();
 		//console.log('ty')
 		MVC.WQPs = new MVC.Collections.WQPS();
 		//console.log('view')
@@ -941,6 +941,9 @@ MVC.Router = Backbone.Router.extend({
 					sobj.addOne(val);
 				})
 				sobj.render();
+                                MVC.types = new MVC.Collections.Data_filters()
+                                new MVC.Views.sourceFilters({ collection: MVC.types });//Add this line
+                                MVC.types.fetch();
 			}
 		})
 	}
