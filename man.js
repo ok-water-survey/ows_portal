@@ -2,7 +2,8 @@
 	Models: {},
 	Collections: {},
 	Views: {},
-	Templates: {}
+	Templates: {},
+        SourceTypes:[]
 }
 var filter_source_parent={};
 var setFilter = {
@@ -17,8 +18,6 @@ var setFilter = {
 				console.log(value);
 				var temp = value.replace("Source = '",''); ///\s+/g, '');
 				temp = temp.replace("'",'');
-				//temp = temp.replace(/Source=/g,'');
-				//temp = temp.replace(/'/g,'') + '_type';
 				console.log(temp)
 				temp = filter_source_parent[temp]
 				temp = temp + '_type';
@@ -49,7 +48,6 @@ var setFilter = {
 			wsaq1 = '(' + wsaq1.join(' OR ') + ')'
 			wsaq1 = wsaq1.replace(/aquifer/g,'aquifers')
 			wsaq = ' AND (' + wsaq + ' OR ' + wsaq1 + ')'
-			//console.log(wsaq)
 		} else {
 			if (filter.watershed !== null) {
 				wsaq = ' AND (' + filter.watershed.join(' OR ') + ')'
@@ -63,11 +61,6 @@ var setFilter = {
 		if (filter.last_activity !== null){
 			last_act = " AND (last_activity >= '" + filter.last_activity + "')"
 		}
-		//if (filter.type !== null) {
-		//	ty = ' AND (' + filter.type.join(' OR ') + ')'
-		//} else {
-		//	ty = ''
-		//}
 		filt = filt + wsaq  + last_act // + ty
 		console.log(filt);
 		updateFilter(filt);
@@ -260,14 +253,10 @@ MVC.Views.sourceFilters = Backbone.View.extend({
 		this.collection.bind("add", this.addOne, this);
 	},
 	render: function () {
-		$('#usgs_type').html(this.template());//TemplateManager.get(this.template)())
-		$('#mesonet_type').html(this.template());
-		$('#owrb_type').html(this.template());
-		$('#owrbmw_type').html(this.template());
-		$('#wqp_type').html(this.template());
-		$('#owrbmww_type').html(this.template());
-		//add next
-		//this.addAll();
+                MVC.SourceTypes
+                for (var x in MVC.SourceTypes){
+                    $('#' + MVC.SourceTypes[x]).html(this.template());
+                }
 	},
 	addAll: function () {
 		this.collection.each(this.addOne);
@@ -294,9 +283,6 @@ MVC.Views.Source = Backbone.View.extend({
 		//Initialize Backbone js temple
 		this.template = TemplateManager.get(this.template);
 		this.sub_template = TemplateManager.get(this.sub_template);
-		//_.bindAll(this, 'render', 'test');
-		//////////this.model.bind('destroy', this.destroyItem, this);
-		//this.model.bind('remove', this.removeItem, this);
 	},
 	afterRender: function () {
 		var $addFilterdata = this.model.toJSON();
@@ -307,6 +293,13 @@ MVC.Views.Source = Backbone.View.extend({
 	},
 	render: function () {
 		var $addFilterdata = this.model.toJSON(); //data
+
+                //Set filter type divs
+                if ($addFilterdata.sub==false){
+                    temp = "".concat($addFilterdata.value.toLowerCase(),"_type")
+                    $('#dialog-filter').append('<div id="' + temp +  '" class="filter-dim filter-ul ' + $addFilterdata.value + ' TYPE_FILTER"></div>')
+                    MVC.SourceTypes.push(temp)
+                }
 		//Get color
 		var $color = "#5258ba" //Default Color
 		if ("color" in $addFilterdata) {
@@ -317,7 +310,6 @@ MVC.Views.Source = Backbone.View.extend({
 		$filt = "Source = '" + $addFilterdata.value + "'";
 		//console.log($addFilterdata.sub)
 		if ($addFilterdata.sub == true) {
-			//$addFilterdata.name = ' - ' + $addFilterdata.name;
 			//Set undo item in list then hide
 			this.undoitem = this.undoitem.replace(/my_id/g, $addFilterdata.value);
 			this.undoitem = this.undoitem.replace(/my_name/g, '&nbsp;' + $addFilterdata.name.split('(')[0]);
@@ -327,15 +319,11 @@ MVC.Views.Source = Backbone.View.extend({
 			this.undoitem = this.undoitem.replace(/my_class/g, $addFilterdata.parent + 'ct')
 			$addFilterdata.name = '&nbsp;&nbsp;' + $addFilterdata.name.split('(')[0];
 			this.undoitem = this.undoitem.replace(/my_source/g,'');
-			//$addFilterdata.name = $addFilterdata.name.split('(')[0];
 			//Set template
 			filter_source_parent[$addFilterdata.value] = $addFilterdata.parent
-			//console.log(this.sub_template($addFilterdata))
 			$(this.el).append(this.sub_template($addFilterdata));
-			//$filt = "huc_8 = '" + $addFilterdata.huc_id + "'";
 
 		} else {
-			//$addFilterdata.name = '&nbsp;' + $addFilterdata.name.split('(')[0];
 			//Set template
 			$(this.el).append(this.template($addFilterdata));
 			//Set undo item in list then hide
@@ -347,8 +335,6 @@ MVC.Views.Source = Backbone.View.extend({
 			this.undoitem = this.undoitem.replace(/my_type/g, 'undo_main')
 			this.undoitem = this.undoitem.replace(/my_source/g, $addFilterdata.value);
 			//set divider
-			//this.undoitem = this.undoitem + '<li class="divider"></li>'
-			//$filt = "huc_4 = '" + $addFilterdata.huc_id + "'";
 			filter_source_parent[$addFilterdata.value] = $addFilterdata.value
 		}
 		//Set link Color
@@ -356,14 +342,9 @@ MVC.Views.Source = Backbone.View.extend({
 		this.undoitem = this.undoitem.replace(/btn_id/g, $addFilterdata.value)
 
 		//Set undo item in list then hide
-		//this.undoitem = this.undoitem.replace(/my_id/g, $addFilterdata.value);
-		//this.undoitem = this.undoitem.replace(/my_name/g, $addFilterdata.name);
 		var $undolist = this.undolist
-		//console.log(this.undoitem)
 		$undolist.append(this.undoitem);
-		//$undolist.append(this.undomenu);
 		var $undoitm = $('#' + $addFilterdata.value + '_li')
-		//$undoitm.find("ul").append('<li><a href="#">Action</a></li>')
 		var $undoitmclick = $('.' + $addFilterdata.value + '_li_clk')
 		var $visible = false;
 
@@ -372,16 +353,10 @@ MVC.Views.Source = Backbone.View.extend({
 			filter.source = []
 			//Load data
 			filter.source.push("Source = '" + $addFilterdata.value + "'")
-			//load_sites (siteLayer, $addFilterdata.url,$addFilterdata.value ,$addFilterdata.mapping)
 			$visible = true;
 		} else {
 			$undoitm.hide();
 		}
-		//Hide subs
-		//if('parent' in $addFilterdata){
-		//	$('.' + $addFilterdata.parent).hide();
-		//}
-
 
 		//Setup event Handle
 		var $addFilterAction = this.$('.add_filter');
@@ -389,14 +364,12 @@ MVC.Views.Source = Backbone.View.extend({
 
 		//Click event handler
 		$addFilterAction.click(function () {
-			//console.log($addFilterdata.hassubs);
 			if ($addFilterdata.hassubs) {
 				if ($('.' + $addFilterdata.value).is(':visible')) {
 					$('.' + $addFilterdata.value).hide();
 				} else {
 					$('.' + $addFilterdata.value).show();
 				}
-				//console.log('.' + $addFilterdata.value)
 			} else {
 				if ($addFilterdata.sub){
 					var subparent = $('#' + $addFilterdata.parent + '_li');
@@ -406,7 +379,6 @@ MVC.Views.Source = Backbone.View.extend({
 					}
 				}
 				if (!$visible) {
-					//console.log($addFilterdata.huc_id);
 					if (filter.source == null) {
 						filter.source = [];
 					}
@@ -427,27 +399,17 @@ MVC.Views.Source = Backbone.View.extend({
 					}
 					//Set the visible site total
 					apply_current()
-					//apply_filter();
-					//Show close li on
 					$undolist.show();
 					$undoitm.show();
 					$visible = true;
 					if ($addFilterdata.sub) {
 						$('.' + $addFilterdata.parent + '_pli').show()
-						//$('.' + $addFilterdata.parent + '_pli .icon-remove-circle').hide()
 					}
-
-					//resetFeatures($showFilter)
-					//if ($fdata == null) {
-					//	$fdata = GeojsonManager.get($addFilterdata.huc_id, 'Watershed');
-					//}
-					//showFeature($fdata, $showFilter);
 				}
 			}
 		});
 		$undoitm.mouseover(function () {
 			try {
-				//console.log("Mouseover")
 				selectFeature.select(filterLayer.getFeaturesByAttribute('Source', $addFilterdata.value)[0])
 			} catch (err) {
 				//Let Pass
@@ -456,7 +418,6 @@ MVC.Views.Source = Backbone.View.extend({
 		});
 		$undoitm.mouseout(function () {
 			try {
-				//console.log("mouseout")
 				selectFeature.unselect(filterLayer.getFeaturesByAttribute('Source', $addFilterdata.value)[0])
 			} catch (err) {
 				//Let Pass
@@ -465,14 +426,8 @@ MVC.Views.Source = Backbone.View.extend({
 		});
 
 		$undoitmclick.click(function () {
-			//console.log($('.' + $addFilterdata.parent + 'ct_pli:visible').length)
-			//if ($addFilterdata.hassubs && $('.' + $addFilterdata.parent + 'ct_pli:visible').length > 0) {
-			//	console.log('Nothing');
-			//} else {
 				if ($('#sourceFilt > li:visible').length == 1) {
-					//console.log(filter.source);
 					filter.source = null;
-					//console.log(filter.source);
 					$undolist.hide()
 				} else {
 					var index = filter.source.indexOf($filt);
@@ -483,18 +438,13 @@ MVC.Views.Source = Backbone.View.extend({
 					$('.' + $addFilterdata.parent + '_pli').hide()
 					console.log($addFilterdata.parent)
 				}
-				//console.log($addFilterdata.hassubs)
-				//console.log($addFilterdata.parent)
 				if ($addFilterdata.hassubs){
 					$('.' + $addFilterdata.value + 'ct_pli').hide();
 				}
 				$undoitm.hide();
 				setFilter.set();
 				apply_current()
-				//apply_filter();
 				$visible = false;
-				//removeFeature('HUC', $addFilterdata.huc_id)
-			//}
 
 		});
 		$filterButton.click(function () {
@@ -505,9 +455,6 @@ MVC.Views.Source = Backbone.View.extend({
 				.dialog('option','title', "<b>" + $addFilterdata.name + " Filter</b>")
 				.dialog('open');
 		});
-		//$undoitmclick.click(function(){
-		//	alert('hi');
-		//})
 
 		return $(this.el);
 	}
@@ -522,13 +469,10 @@ MVC.Views.Watershed = Backbone.View.extend({
 	initialize: function () {
 		//Initialize Backbone js temple
 		this.template = TemplateManager.get(this.template)
-		//_.bindAll(this, 'render', 'test');
 		this.model.bind('destroy', this.destroyItem, this);
-		//this.model.bind('remove', this.removeItem, this);
 
 	},
 	render: function () {
-		//console.log('render')
 		//Render template inside our view
 		var $addFilterdata = this.model.toJSON(); //data
 		//Set watershed name
@@ -623,11 +567,7 @@ MVC.Views.Watershed = Backbone.View.extend({
 
 		});
 		return $(this.el) //$(this.el).append(this.template(this.model.toJSON())) ;
-	}/*,
-	 removeItem: function (model) {
-	 console.log("Remove - " + model.get("Name"))
-	 this.remove();
-	 }*/
+	}
 })
 MVC.Views.Aquifer = Backbone.View.extend({
 	tagName: "li",
@@ -637,9 +577,7 @@ MVC.Views.Aquifer = Backbone.View.extend({
 	initialize: function () {
 		//Initialize Backbone js temple
 		this.template = TemplateManager.get(this.template)
-		//_.bindAll(this, 'render', 'test');
 		this.model.bind('destroy', this.destroyItem, this);
-		//this.model.bind('remove', this.removeItem, this);
 	},
 	render: function () {
 		//Render template inside our view
@@ -711,13 +649,11 @@ MVC.Views.Aquifer = Backbone.View.extend({
 			$.each(filterLayer.getFeaturesByAttribute('NAME', $addFilterdata.org_name), function (idx, val) {
 				selectFeature.select(val);
 			});
-			//selectFeature.select(filterLayer.getFeaturesByAttribute('NAME',$addFilterdata.org_name )[0])
 		});
 		$undoitm.mouseout(function () {
 			$.each(filterLayer.getFeaturesByAttribute('NAME', $addFilterdata.org_name), function (idx, val) {
 				selectFeature.unselect(val);
 			});
-			//selectFeature.unselect(filterLayer.getFeaturesByAttribute('NAME',$addFilterdata.org_name )[0])
 		});
 		$undoitm.click(function () {
 			if ($('#currentFilt_aquifer > li:visible').length == 1) {
@@ -735,12 +671,8 @@ MVC.Views.Aquifer = Backbone.View.extend({
 			$visible = false;
 			removeFeature('NAME', $addFilterdata.org_name)
 		});
-		return {position: $ul, template: $(this.el)} //$(this.el).append(this.template(this.model.toJSON())) ;
-	}//,
-	//removeItem: function (model) {
-	//	console.log("Remove - " + model.get("Name"))
-	//	this.remove();
-	//}
+		return {position: $ul, template: $(this.el)} 
+	}
 });
 MVC.Views.sourceFilter = Backbone.View.extend({
 	tagName: "li",
@@ -775,14 +707,6 @@ MVC.Views.sourceFilter = Backbone.View.extend({
 		$undolist.append(this.undoitem);
 		var $undoitm = $('#type_' + $addFilterdata.class + $addFilterdata.order.toString() + '_li').hide();
 		var $visible = false;
-		//var $sites = $('#select_sites');
-		//$sites.change(function () {
-		//	filter.type = null;
-		//	$undolist.hide()
-		//	$undoitm.hide();
-		//	$visible = false;
-			//alert('this has fired');
-		//	});
 		var $filt_list =$addFilterdata.source + '_type'
 		$addFilterAction.click(function () {
 
@@ -800,11 +724,6 @@ MVC.Views.sourceFilter = Backbone.View.extend({
 				$undoitm.show();
 				$visible = true;
 			} else{
-				//var subparent = $('#' + $addFilterdata.source + '_li')
-				//console.log(subparent)
-				//if(subparent.is(':hidden')){
-				//	subparent.show()
-				//}
 				$undoitm.trigger( "click" );
 				$undolist.show();
 			}
@@ -837,36 +756,21 @@ MVC.Views.sourceFilter = Backbone.View.extend({
 			apply_current()
 			$visible = false;
 		});
-		return {position: $addFilterdata.class, template: $(this.el)} //$(this.el).append(this.template(this.model.toJSON())) ;
-	}//,
-	//removeItem: function (model) {
-	//	console.log("Remove - " + model.get("Name"))
-	//	this.remove();
-	//}
+                return {position: $addFilterdata.div_id, template: $(this.el)}
+		//return {position: $addFilterdata.class, template: $(this.el)} //$(this.el).append(this.template(this.model.toJSON())) ;
+	}
 });
 
 //WQP Source Selection View
 MVC.Views.WQPs = Backbone.View.extend({
 	el: $("#subdata"),
 	initialize: function () {
-		//this.template = TemplateManager.get(this.template);
-		//this.render();
-		//_.bindAll(this, "render", "addOne", "addAll");
 		this.collection.bind("reset", this.render, this);
-		//this.collection.bind("add", this.addOne, this);
 		this.collection.bind("done", this.addOne, this)
 	},
 	render: function () {
-		//alert('thisi is great');
-		//$.each(this.collection.models, function (data) {
-		//	console.log(data);
-		//});
 		var $el = $("#subdata");
 		var $sel = $("#select_sites");
-		//$el.change(
-		//	alert('this is it');
-		//)
-
 		$sel.change(function () {
 			if ($sel.val() == 'WQP') {
 				$el.show();
