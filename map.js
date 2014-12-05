@@ -561,13 +561,14 @@ function onFeatureSelect (feature) {
 }
 function showbib (ref_no, source) {
 	//var source = $('#select_sites').val().split("_");
-	if ($("#bibAll" + ref_no).length < 1) {
-		$("body").append('<div id="bibAll' + ref_no + '"></div>');
-		$("#bibAll" + ref_no).dialog({ height: 'auto', width: '900px', position: [300, 100], title: "<h3>Data</h3>", close: function () {
-			$("#bibAll" + ref_no).remove();
+	var refid2 = ref_no.replace(/./g,'');
+	if ($("#bibAll" + refid2).length < 1) {
+		$("body").append('<div id="bibAll' + refid2 + '"></div>');
+		$("#bibAll" + refid2).dialog({ height: 'auto', width: '900px', position: [300, 100], title: "<h3>Data</h3>", close: function () {
+			$("#bibAll" + refid2).remove();
 		} });
 		//var srce = source.split("_")[0]
-		$("#bibAll" + ref_no).append('<iframe id="iframe' + ref_no + '" src="/tools/usgs_metadata/' + ref_no + '?source=' + source + '" width="100%" height="700"></iframe>');
+		$("#bibAll" + refid2).append('<iframe id="iframe' + refid2 + '" src="/tools/usgs_metadata/' + ref_no + '?source=' + source + '" width="100%" height="700"></iframe>');
 	}
 }
 function savesites () {
