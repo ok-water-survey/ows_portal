@@ -74,7 +74,7 @@ function calltask (taskdesc) {
 		"onSuccess": function (data) {
 			$(options1.status).show();
 			$(options1.status).removeClass('label label-success label-warning label-important').addClass('label label-success');
-			$(options1.status).html('<a href="' + data.tombstone[0].result + '">Download</a>');
+			$(options1.status).html('<a style="color:#fff"  href="' + data.tombstone[0].result + '">Download</a>');
 			$(options1.spinner).hide();
 			simpleCart.empty();
 			//siteLayer.styleMap = myStyles1;
